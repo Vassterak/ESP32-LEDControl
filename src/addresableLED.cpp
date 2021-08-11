@@ -1,42 +1,42 @@
 #include "addresableLED.h"
 
 enum{
-    
+
 };
 
-void AddresableLED::SolidPart1(CRGB LEDstrip[], CRGB color)
+void AddresableLED::SolidPart1(CRGB color)
 {
-    fill_solid(LEDstrip, 60, color);
+    fill_solid(leds, 60, color);
 }
 
-void AddresableLED::SolidPart2(CRGB LEDstrip[], CRGB color)
+void AddresableLED::SolidPart2(CRGB color)
 {
-    fill_solid(LEDstrip+60, 89, color);
+    fill_solid(leds+60, 89, color);
 }
 
-void AddresableLED::SolidPart3(CRGB LEDstrip[], CRGB color)
+void AddresableLED::SolidPart3(CRGB color)
 {
-    fill_solid(LEDstrip+89, 149, color);
+    fill_solid(leds+89, 149, color);
 }
 
-void AddresableLED::StaticRainbow(CRGB LEDstrip[],uint8_t numberOfLEDs, uint8_t HUEIncrementor)
+void AddresableLED::StaticRainbow(uint8_t HUEIncrementor)
 {
-    fill_rainbow(LEDstrip, numberOfLEDs, 0, HUEIncrementor);
+    fill_rainbow(leds, NUMBER_OF_LEDS, 0, HUEIncrementor);
 }
 
-void AddresableLED::AnimeRainbow(CRGB LEDstrip[],uint8_t numberOfLEDs,uint8_t speed, uint8_t HUEIncrementor) 
+void AddresableLED::AnimeRainbow(uint8_t speed, uint8_t HUEIncrementor) 
 {
     uint8_t hue = beat8(speed, 255);
-    fill_rainbow(LEDstrip, numberOfLEDs, hue, HUEIncrementor);
+    fill_rainbow(leds, NUMBER_OF_LEDS, hue, HUEIncrementor);
 }
 
-void AddresableLED::FallingStars(CRGB LEDstrip[],uint8_t numberOfLEDs, uint8_t speedOfDisappear, CRGB color)
+void AddresableLED::FallingStars(uint8_t speedOfDisappear, CRGB color)
 {
-    LEDstrip[random8(0, 149-1)] = CRGB(color);
-    fadeToBlackBy(LEDstrip, numberOfLEDs, speedOfDisappear);
+    leds[random8(0, 149-1)] = CRGB(color);
+    fadeToBlackBy(leds, NUMBER_OF_LEDS, speedOfDisappear);
 }
 
-void AddresableLED::Fade1(CRGB LEDstrip[], uint8_t speedOfTransition, CRGB color1, CRGB color2)
+void AddresableLED::Fade1(uint8_t speedOfTransition, CRGB color1, CRGB color2)
 {
     nblend(color1, color2, speedOfTransition);
 }

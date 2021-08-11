@@ -1,31 +1,19 @@
-//necessary libraries
-//using namespace std;
 #include <Arduino.h>
 #include <FastLED.h>
 
-//My classes
+//My files
+#include "definitions.h" //all define values
 #include "addresableLED.h"
 #include "clasicLEDStrip.h"
 
-//Addresable LED pins---------------------------------------------------
-#define NUMBER_OF_LEDS 149 //for addresable LED, 149 because one LED is dead on my strip with 150 leds
-#define DATA_PIN 22 //IO22 Pin nuber 36
-#define BUTTON_PIN 32 //IO14 Pin nuber 13
-
-//Clasic LED strip pins--------------------------------------------------
-#define LED_R 25
-#define LED_G 26
-#define LED_B 27
-
-const int PWMFreq = 60; // 60Hz smooth enought.
+const int PWMFreq = 50; // 50Hz smooth enought. Also the animation will be played at 50FPS and 50Hz is compliant with frequency of power grid in EU. (Avoid flickering in camera)
 const int PWMChannelR = 0, PWMChannelG = 1, PWMChannelB = 2;
 const int PWMResolution = 8; // 8bits, from 0 (off state) to 255 (max brightness) 
 const int MAX_DUTY_CYCLE = (int)(pow(2, PWMResolution) -1 ); //calculates duty cicle from resolution
 
 //Classes -------------------------------------------------------------
-CRGB leds[NUMBER_OF_LEDS]; 
 ClasicLEDStrip _classicLEDStrip;
-AddresableLED _addresableLED;
+//AddresableLED _addresableLED;
 
 //Button control----------------------------------------------------
 uint8_t buttonState = 0;
@@ -48,8 +36,8 @@ void setup()
   ledcSetup(PWMChannelB, PWMFreq, PWMResolution); //BLUE
   ledcAttachPin(LED_B, PWMChannelB);
 
-//SETUP for addresable led strip
-  FastLED.addLeds<NEOPIXEL,DATA_PIN>(leds, NUMBER_OF_LEDS);
+  //FastLED.addLeds<NEOPIXEL,DATA_PIN>(leds, NUMBER_OF_LEDS);
+
   Serial.begin(9600);
 };
 
@@ -77,7 +65,7 @@ void loop()
       ledcWrite(PWMChannelG, 255-i);
     }
     
-    _addresableLED.FallingStars(leds,NUMBER_OF_LEDS, 10, CRGB(10,100,250));
+    //_addresableLED.FallingStars(leds,NUMBER_OF_LEDS, 10, CRGB(10,100,250));
     FastLED.show();
   }
 
