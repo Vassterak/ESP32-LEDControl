@@ -9,7 +9,7 @@
 #include "clasicLEDStrip.h"
 
 //Variables and Classes-------------------------------------------------------------
-uint16_t btMessageCode;
+uint16_t btIDCode;
 uint8_t preState = 0;
 uint8_t counter = 0;
 
@@ -24,12 +24,17 @@ class MyCallbacks: public BLECharacteristicCallbacks
 		if (value.length() > 0)
 		{
 			Serial.println("*********");
-			Serial.print("New value: ");
+			Serial.print("Raw value: ");
+			char outputString[value.length()];
 			for (int i = 0; i < value.length(); i++)
 			{
 				Serial.print(value[i]);
+				outputString[i] = value[i];
 			}
+			btIDCode = atoi(outputString);
 			Serial.println();
+			Serial.print("Output after parsing: ");
+			Serial.println(btIDCode);
 			Serial.println("*********");
 		}
     }
@@ -52,21 +57,28 @@ void setup()
 	ledcAttachPin(LED_B, PWMChannelB);
 
 //Bluetooth setup----------------------------------------------------------------
-  Serial.begin(115200);
-  Serial.println("Starting BLE work!");
+	Serial.begin(115200);
 
-  BLEDevice::init("LED Controller");
-  BLEServer *pServer = BLEDevice::createServer();
-  BLEService *pService = pServer->createService(SERVICE_UUID);
-  BLECharacteristic *pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID,BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
-  pCharacteristic->setAccessPermissions(ESP_GATT_PERM_READ_ENCRYPTED | ESP_GATT_PERM_WRITE_ENCRYPTED);
-  pCharacteristic->setValue("Hello World says Neil");
-  pService->start();
-  BLEAdvertising *pAdvertising = pServer->getAdvertising();
-  pAdvertising->start();
+	BLEDevice::init(BLE_DEV_NAME); //Bluetooth device name
+	BLEServer *pServer = BLEDevice::createServer();
+	BLEService *pService = pServer->createService(SERVICE_UUID);
+	//BLECharacteristic *pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID,BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
+	BLECharacteristic *pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID,BLECharacteristic::PROPERTY_WRITE);
+	//pCharacteristic->setAccessPermissions(ESP_GATT_PERM_READ_ENCRYPTED | ESP_GATT_PERM_WRITE_ENCRYPTED);
+	pCharacteristic->setCallbacks(new MyCallbacks());
 
-  BLESecurity *pSecurity = new BLESecurity();
-  pSecurity->setStaticPIN(BLE_PASSCODE); //change the passcode for your own
+	pService->start();
+	BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+	//BLEAdvertising *pAdvertising = pServer->getAdvertising();
+
+	//functions that help with iPhone connections issue
+/* 	pAdvertising->setMinPreferred(0x06);  
+	pAdvertising->setMinPreferred(0x12); */
+	pAdvertising->start();
+
+	BLESecurity *pSecurity = new BLESecurity();
+	pSecurity->setStaticPIN(BLE_PASSCODE);
+
 };
 
 void loop() 
@@ -74,9 +86,10 @@ void loop()
   //Button-------------------------------------------------------------------
 	if (digitalRead(BUTTON_PIN) == HIGH && preState == 0)
 	{
-		counter++;
-		Serial.println(String(counter));
+/* 		counter++;
+		Serial.println(String(counter)); */
 		preState = 1;
+		ESP.restart();
 	}
 	else if (digitalRead(BUTTON_PIN) == LOW)
 	{
@@ -91,45 +104,34 @@ void loop()
 			ledcWrite(PWMChannelG, 255-i);
 		}
 	
-	switch (btMessageCode)
+	switch (btIDCode)
 	{
 		case 110:
 			_addresableLED.FallingStars(10, CRGB(10,100,250));
-			Serial.print("Hodnota změněna na: ");
-			Serial.println(btMessageCode);
 			break;
 
 		case 111:
 			_addresableLED.FallingStars(20, CRGB(200,10,2));
-			Serial.print("Hodnota změněna na: ");
-			Serial.println(btMessageCode);
 			break;
 
 		case 112:
 			_addresableLED.AnimeRainbow(20, 1);
-			Serial.print("Hodnota změněna na: ");
-			Serial.println(btMessageCode);
 			break;
 
 		case 113:
 			_addresableLED.AnimeRainbow(40, 1);
-			Serial.print("Hodnota změněna na: ");
-			Serial.println(btMessageCode);
 		break;
 
 		case 114:
 			_addresableLED.AnimeRainbow(60, 2);
-			Serial.print("Hodnota změněna na: ");
-			Serial.println(btMessageCode);
 		break;
 
 		case 115:
-
 		break;
 
 		default:
-			Serial.print("Hodnota je: ");
-			Serial.println(btMessageCode);
+/* 			Serial.print("Hodnota je: ");
+			Serial.println(btIDCode); */
 			break;
 	}
 
