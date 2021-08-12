@@ -4,10 +4,10 @@
 class AddresableLED
 {
     public:
-    CRGB leds[NUMBER_OF_LEDS];
+    CRGB leds[LEDS_TOTAL_NUMBER];
     AddresableLED()
     {
-        FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUMBER_OF_LEDS);
+        FastLED.addLeds<NEOPIXEL,LEDS_DATA_PIN>(leds, LEDS_TOTAL_NUMBER);
     }
 
     void SolidPart1(CRGB color); //right side of bed
