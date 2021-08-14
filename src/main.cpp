@@ -40,6 +40,30 @@ class MyCallbacks: public BLECharacteristicCallbacks
     }
 };
 
+class MyCallbackse: public BLECharacteristicCallbacks
+{
+    void onWrite(BLECharacteristic *pCharacteristice)
+	{
+		std::string value = pCharacteristice->getValue();
+		if (value.length() > 0)
+		{
+			Serial.println("*********");
+			Serial.print("Raw value2: ");
+			char outputString[value.length()];
+			for (int i = 0; i < value.length(); i++)
+			{
+				Serial.print(value[i]);
+				outputString[i] = value[i];
+			}
+			btIDCode = atoi(outputString);
+			Serial.println();
+			Serial.print("Output after parsing2: ");
+			Serial.println(btIDCode);
+			Serial.println("*********");
+		}
+    }
+};
+
 void setup()
 {
 	pinMode(BUTTON_PIN, INPUT_PULLDOWN); //input for the test button
@@ -58,18 +82,25 @@ void setup()
 
 //Bluetooth setup----------------------------------------------------------------
 	Serial.begin(115200);
-
-	BLEDevice::init(BLE_DEV_NAME); //Bluetooth device name
+	//Bluetooth device name
+	BLEDevice::init(BLE_DEV_NAME);
+	//Create a server
 	BLEServer *pServer = BLEDevice::createServer();
+
+	//Create service
 	BLEService *pService = pServer->createService(SERVICE_UUID);
-	//BLECharacteristic *pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID,BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
+
 	BLECharacteristic *pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID,BLECharacteristic::PROPERTY_WRITE);
+	pService->createCharacteristic(CHARACTERISTIC_UUID2,BLECharacteristic::PROPERTY_WRITE);
+	pService->createCharacteristic(CHARACTERISTIC_UUID3,BLECharacteristic::PROPERTY_WRITE);
+	//pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID2, BLECharacteristic::PROPERTY_WRITE);
+
+
 	//pCharacteristic->setAccessPermissions(ESP_GATT_PERM_READ_ENCRYPTED | ESP_GATT_PERM_WRITE_ENCRYPTED);
 	pCharacteristic->setCallbacks(new MyCallbacks());
-
 	pService->start();
-	BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
-	//BLEAdvertising *pAdvertising = pServer->getAdvertising();
+	//BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+	BLEAdvertising *pAdvertising = pServer->getAdvertising();
 
 	//functions that help with iPhone connections issue
 /* 	pAdvertising->setMinPreferred(0x06);  
