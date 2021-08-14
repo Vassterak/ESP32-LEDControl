@@ -16,35 +16,21 @@ uint8_t counter = 0;
 ClasicLEDStrip _classicLEDStrip;
 AddresableLED _addresableLED;
 
-class MyCallbacks: public BLECharacteristicCallbacks
+class MyCallback: public BLECharacteristicCallbacks
 {
+	//Called when data is sent to ESP32 for process
     void onWrite(BLECharacteristic *pCharacteristic)
 	{
-		std::string value = pCharacteristic->getValue();
-		if (value.length() > 0)
-		{
-			Serial.println("*********");
-			Serial.print("Raw value: ");
-			char outputString[value.length()];
-			for (int i = 0; i < value.length(); i++)
-			{
-				Serial.print(value[i]);
-				outputString[i] = value[i];
-			}
-			btIDCode = atoi(outputString);
-			Serial.println();
-			Serial.print("Output after parsing: ");
-			Serial.println(btIDCode);
-			Serial.println("*********");
-		}
+		Zpracovani(pCharacteristic->getValue());
     }
 };
 
-class MyCallbackse: public BLECharacteristicCallbacks
+class MyCallback2: public BLECharacteristicCallbacks
 {
-    void onWrite(BLECharacteristic *pCharacteristice)
+	//Called when data is sent to ESP32 for process
+    void onWrite(BLECharacteristic *pCharacteristic2)
 	{
-		std::string value = pCharacteristice->getValue();
+		std::string value = pCharacteristic2->getValue();
 		if (value.length() > 0)
 		{
 			Serial.println("*********");
@@ -55,6 +41,7 @@ class MyCallbackse: public BLECharacteristicCallbacks
 				Serial.print(value[i]);
 				outputString[i] = value[i];
 			}
+
 			btIDCode = atoi(outputString);
 			Serial.println();
 			Serial.print("Output after parsing2: ");
@@ -63,6 +50,54 @@ class MyCallbackse: public BLECharacteristicCallbacks
 		}
     }
 };
+
+class MyCallback3: public BLECharacteristicCallbacks
+{
+	//Called when data is sent to ESP32 for process
+    void onWrite(BLECharacteristic *pCharacteristic3)
+	{
+		Serial.println("Metoda se spustila---------------------------");
+		std::string value = pCharacteristic3->getValue();
+		if (value.length() > 0)
+		{
+			Serial.println("*********");
+			Serial.print("Raw value3: ");
+			char outputString[value.length()];
+			for (int i = 0; i < value.length(); i++)
+			{
+				Serial.print(value[i]);
+				outputString[i] = value[i];
+			}
+
+			btIDCode = atoi(outputString);
+			Serial.println();
+			Serial.print("Output after parsing3: ");
+			Serial.println(btIDCode);
+			Serial.println("*********");
+		}
+    }
+};
+
+void Zpracovani(std::string input)
+{
+	if (input.length() > 0)
+	{
+		Serial.println("*********");
+		Serial.print("Raw value: ");
+		char outputString[input.length()];
+		for (int i = 0; i < input.length(); i++)
+		{
+			Serial.print(input[i]);
+			outputString[i] = input[i];
+		}
+
+		btIDCode = atoi(outputString);
+		Serial.println();
+		Serial.print("Output after parsing: ");
+		Serial.println(btIDCode);
+		Serial.println("*********");
+	}
+}
 
 void setup()
 {
@@ -82,22 +117,20 @@ void setup()
 
 //Bluetooth setup----------------------------------------------------------------
 	Serial.begin(115200);
-	//Bluetooth device name
-	BLEDevice::init(BLE_DEV_NAME);
-	//Create a server
-	BLEServer *pServer = BLEDevice::createServer();
 
-	//Create service
-	BLEService *pService = pServer->createService(SERVICE_UUID);
+	BLEDevice::init(BLE_DEV_NAME); //Bluetooth device name
+	BLEServer *pServer = BLEDevice::createServer(); //Create a server
+	BLEService *pService = pServer->createService(SERVICE_UUID); //Create a server
 
 	BLECharacteristic *pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID,BLECharacteristic::PROPERTY_WRITE);
-	pService->createCharacteristic(CHARACTERISTIC_UUID2,BLECharacteristic::PROPERTY_WRITE);
-	pService->createCharacteristic(CHARACTERISTIC_UUID3,BLECharacteristic::PROPERTY_WRITE);
-	//pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID2, BLECharacteristic::PROPERTY_WRITE);
+	pCharacteristic->setCallbacks(new MyCallback());
 
+ 	pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID2,BLECharacteristic::PROPERTY_WRITE);
+	pCharacteristic->setCallbacks(new MyCallback2());
 
-	//pCharacteristic->setAccessPermissions(ESP_GATT_PERM_READ_ENCRYPTED | ESP_GATT_PERM_WRITE_ENCRYPTED);
-	pCharacteristic->setCallbacks(new MyCallbacks());
+	pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID3,BLECharacteristic::PROPERTY_WRITE);
+	pCharacteristic->setCallbacks(new MyCallback3());
+
 	pService->start();
 	//BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
 	BLEAdvertising *pAdvertising = pServer->getAdvertising();
@@ -105,6 +138,7 @@ void setup()
 	//functions that help with iPhone connections issue
 /* 	pAdvertising->setMinPreferred(0x06);  
 	pAdvertising->setMinPreferred(0x12); */
+
 	pAdvertising->start();
 
 	BLESecurity *pSecurity = new BLESecurity();
@@ -169,4 +203,10 @@ void loop()
 	FastLED.show();
   }
 
+	EVERY_N_SECONDS(5)
+	{
+		Serial.print("Free heap: ");
+		Serial.print(ESP.getFreeHeap());
+		Serial.println("kB");
+	}
 };
