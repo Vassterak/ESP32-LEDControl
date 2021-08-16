@@ -4,19 +4,9 @@ enum{
 
 };
 
-void AddresableLED::SolidPart1(CRGB color)
+void AddresableLED::SolidPart(CRGB color, int fromZone, int toZone)
 {
-    fill_solid(leds, 60, color);
-}
-
-void AddresableLED::SolidPart2(CRGB color)
-{
-    fill_solid(leds+60, 89, color);
-}
-
-void AddresableLED::SolidPart3(CRGB color)
-{
-    fill_solid(leds+89, 149, color);
+    fill_solid(leds+fromZone, toZone, color);
 }
 
 void AddresableLED::StaticRainbow(uint8_t HUEIncrementor)

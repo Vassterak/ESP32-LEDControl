@@ -9,81 +9,62 @@
 #include "clasicLEDStrip.h"
 
 //Variables and Classes-------------------------------------------------------------
-uint16_t btIDCode;
 uint8_t preState = 0;
 uint8_t counter = 0;
 
 ClasicLEDStrip _classicLEDStrip;
 AddresableLED _addresableLED;
 
-class MyCallback: public BLECharacteristicCallbacks
+class ADDROpMode: public BLECharacteristicCallbacks
 {
 	//Called when data is sent to ESP32 for process
     void onWrite(BLECharacteristic *pCharacteristic)
 	{
-		Zpracovani(pCharacteristic->getValue());
+		//InputProcessing(pCharacteristic->getValue());
     }
 };
 
-class MyCallback2: public BLECharacteristicCallbacks
+class ADDRBrightness: public BLECharacteristicCallbacks
 {
 	//Called when data is sent to ESP32 for process
     void onWrite(BLECharacteristic *pCharacteristic2)
 	{
-		std::string value = pCharacteristic2->getValue();
-		if (value.length() > 0)
-		{
-			Serial.println("*********");
-			Serial.print("Raw value2: ");
-			char outputString[value.length()];
-			for (int i = 0; i < value.length(); i++)
-			{
-				Serial.print(value[i]);
-				outputString[i] = value[i];
-			}
-
-			btIDCode = atoi(outputString);
-			Serial.println();
-			Serial.print("Output after parsing2: ");
-			Serial.println(btIDCode);
-			Serial.println("*********");
-		}
+		
     }
 };
 
-class MyCallback3: public BLECharacteristicCallbacks
+class ADDRPart1: public BLECharacteristicCallbacks
 {
 	//Called when data is sent to ESP32 for process
     void onWrite(BLECharacteristic *pCharacteristic3)
 	{
-		Serial.println("Metoda se spustila---------------------------");
-		std::string value = pCharacteristic3->getValue();
-		if (value.length() > 0)
-		{
-			Serial.println("*********");
-			Serial.print("Raw value3: ");
-			char outputString[value.length()];
-			for (int i = 0; i < value.length(); i++)
-			{
-				Serial.print(value[i]);
-				outputString[i] = value[i];
-			}
-
-			btIDCode = atoi(outputString);
-			Serial.println();
-			Serial.print("Output after parsing3: ");
-			Serial.println(btIDCode);
-			Serial.println("*********");
-		}
+		InputProcessing(pCharacteristic3->getValue());
     }
 };
 
-void Zpracovani(std::string input)
+class ADDRPart2: public BLECharacteristicCallbacks
+{
+	//Called when data is sent to ESP32 for process
+    void onWrite(BLECharacteristic *pCharacteristic3)
+	{
+
+    }
+};
+
+class ADDRPart3: public BLECharacteristicCallbacks
+{
+	//Called when data is sent to ESP32 for process
+    void onWrite(BLECharacteristic *pCharacteristic3)
+	{
+
+    }
+};
+
+uint16_t InputProcessing(std::string input)
 {
 	if (input.length() > 0)
 	{
-		Serial.println("*********");
-		Serial.print("Raw value: ");
+		Serial.print("*********\nRaw value: ");
 		char outputString[input.length()];
 		for (int i = 0; i < input.length(); i++)
 		{
@@ -91,11 +72,9 @@ void Zpracovani(std::string input)
 			outputString[i] = input[i];
 		}
 
-		btIDCode = atoi(outputString);
-		Serial.println();
-		Serial.print("Output after parsing: ");
-		Serial.println(btIDCode);
-		Serial.println("*********");
+		Serial.print("\nOutput after parsing: ");
+		Serial.println(atoi(outputString));
+		return atoi(outputString);
 	}
 }
 
@@ -122,14 +101,20 @@ void setup()
 	BLEServer *pServer = BLEDevice::createServer(); //Create a server
 	BLEService *pService = pServer->createService(SERVICE_UUID); //Create a server
 
-	BLECharacteristic *pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID,BLECharacteristic::PROPERTY_WRITE);
-	pCharacteristic->setCallbacks(new MyCallback());
+	BLECharacteristic *pCharacteristic = pService->createCharacteristic(ADDR_OPER_MODE,BLECharacteristic::PROPERTY_WRITE);
+	pCharacteristic->setCallbacks(new (ADDROpMode));
 
- 	pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID2,BLECharacteristic::PROPERTY_WRITE);
-	pCharacteristic->setCallbacks(new MyCallback2());
+	pCharacteristic = pService->createCharacteristic(ADDR_BRIGHTNESS,BLECharacteristic::PROPERTY_WRITE);
+	pCharacteristic->setCallbacks(new ADDRBrightness());
 
-	pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID3,BLECharacteristic::PROPERTY_WRITE);
-	pCharacteristic->setCallbacks(new MyCallback3());
+ 	pCharacteristic = pService->createCharacteristic(ADDR_ZONE1,BLECharacteristic::PROPERTY_WRITE);
+	pCharacteristic->setCallbacks(new ADDRPart1());
+
+	pCharacteristic = pService->createCharacteristic(ADDR_ZONE2,BLECharacteristic::PROPERTY_WRITE);
+	pCharacteristic->setCallbacks(new ADDRPart2());
+
+	pCharacteristic = pService->createCharacteristic(ADDR_ZONE3,BLECharacteristic::PROPERTY_WRITE);
+	pCharacteristic->setCallbacks(new ADDRPart3());
 
 	pService->start();
 	//BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
@@ -163,45 +148,45 @@ void loop()
 
 	EVERY_N_MILLISECONDS(20) //20ms = 50FPS
 	{
-		for (uint8_t i = 0; i < 255; i +=5)
+/* 		for (uint8_t i = 0; i < 255; i +=5)
 		{
 			ledcWrite(PWMChannelR, i);
 			ledcWrite(PWMChannelG, 255-i);
-		}
+		} */
 	
-	switch (btIDCode)
-	{
-		case 110:
-			_addresableLED.FallingStars(10, CRGB(10,100,250));
+	/* 	switch (btIDCode)
+		{
+			case 110:
+				_addresableLED.FallingStars(10, CRGB(10,100,250));
+				break;
+
+			case 111:
+				_addresableLED.FallingStars(20, CRGB(200,10,2));
+				break;
+
+			case 112:
+				_addresableLED.AnimeRainbow(20, 1);
+				break;
+
+			case 113:
+				_addresableLED.AnimeRainbow(40, 1);
 			break;
 
-		case 111:
-			_addresableLED.FallingStars(20, CRGB(200,10,2));
+			case 114:
+				_addresableLED.AnimeRainbow(60, 2);
 			break;
 
-		case 112:
-			_addresableLED.AnimeRainbow(20, 1);
+			case 115:
 			break;
 
-		case 113:
-			_addresableLED.AnimeRainbow(40, 1);
-		break;
+			default:
+				break;
+		} */
 
-		case 114:
-			_addresableLED.AnimeRainbow(60, 2);
-		break;
 
-		case 115:
-		break;
 
-		default:
-/* 			Serial.print("Hodnota je: ");
-			Serial.println(btIDCode); */
-			break;
-	}
-
-	FastLED.show();
-  }
+		FastLED.show();
+  	}
 
 	EVERY_N_SECONDS(5)
 	{
