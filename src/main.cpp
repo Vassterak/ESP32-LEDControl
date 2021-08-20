@@ -1,5 +1,5 @@
-#include <Arduino.h>
-#include <FastLED.h>
+/* #include <Arduino.h>
+#include <FastLED.h> */
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
@@ -7,76 +7,91 @@
 //My files
 #include "addresableLED.h" //includes definitions.h
 #include "clasicLEDStrip.h"
+#include "proccesingFunctions.h"
 
 //Variables and Classes-------------------------------------------------------------
-uint8_t preState = 0;
-uint8_t counter = 0;
+bool preState = 0; //for the button
 
 ClasicLEDStrip _classicLEDStrip;
 AddresableLED _addresableLED;
 
-class ADDROpMode: public BLECharacteristicCallbacks
+class ZoneSelect: public BLECharacteristicCallbacks
 {
 	//Called when data is sent to ESP32 for process
     void onWrite(BLECharacteristic *pCharacteristic)
 	{
-		//InputProcessing(pCharacteristic->getValue());
+		switch (ProccesingFunctions::IDInputProcessing(pCharacteristic->getValue()))
+		{
+		case 1:
+
+			break;
+
+		case 2:
+
+			break;
+
+		case 3:
+
+			break;
+
+		default:
+			break;
+		}
     }
 };
 
-class ADDRBrightness: public BLECharacteristicCallbacks
+class ModeSelect: public BLECharacteristicCallbacks
 {
 	//Called when data is sent to ESP32 for process
     void onWrite(BLECharacteristic *pCharacteristic2)
+	{
+		switch (ProccesingFunctions::IDInputProcessing(pCharacteristic2->getValue()))
+		{
+		case 1:
+
+			break;
+
+		case 2:
+
+			break;
+
+		case 3:
+
+			break;
+
+		default:
+			break;
+		}
+    }
+};
+
+class EffectSelect: public BLECharacteristicCallbacks
+{
+	//Called when data is sent to ESP32 for process
+    void onWrite(BLECharacteristic *pCharacteristic3)
 	{
 		
     }
 };
 
-class ADDRPart1: public BLECharacteristicCallbacks
+class ColorSelect: public BLECharacteristicCallbacks
 {
 	//Called when data is sent to ESP32 for process
-    void onWrite(BLECharacteristic *pCharacteristic3)
-	{
-		InputProcessing(pCharacteristic3->getValue());
-    }
-};
-
-class ADDRPart2: public BLECharacteristicCallbacks
-{
-	//Called when data is sent to ESP32 for process
-    void onWrite(BLECharacteristic *pCharacteristic3)
+    void onWrite(BLECharacteristic *pCharacteristic4)
 	{
 
     }
 };
 
-class ADDRPart3: public BLECharacteristicCallbacks
+class SpeedSelect: public BLECharacteristicCallbacks
 {
 	//Called when data is sent to ESP32 for process
-    void onWrite(BLECharacteristic *pCharacteristic3)
+    void onWrite(BLECharacteristic *pCharacteristic5)
 	{
 
     }
 };
 
-uint16_t InputProcessing(std::string input)
-{
-	if (input.length() > 0)
-	{
-		Serial.print("*********\nRaw value: ");
-		char outputString[input.length()];
-		for (int i = 0; i < input.length(); i++)
-		{
-			Serial.print(input[i]);
-			outputString[i] = input[i];
-		}
-
-		Serial.print("\nOutput after parsing: ");
-		Serial.println(atoi(outputString));
-		return atoi(outputString);
-	}
-}
 
 void setup()
 {
@@ -101,20 +116,20 @@ void setup()
 	BLEServer *pServer = BLEDevice::createServer(); //Create a server
 	BLEService *pService = pServer->createService(SERVICE_UUID); //Create a server
 
-	BLECharacteristic *pCharacteristic = pService->createCharacteristic(ADDR_OPER_MODE,BLECharacteristic::PROPERTY_WRITE);
-	pCharacteristic->setCallbacks(new (ADDROpMode));
+	BLECharacteristic *pCharacteristic = pService->createCharacteristic(LED_ZONE_SELECT,BLECharacteristic::PROPERTY_WRITE);
+	pCharacteristic->setCallbacks(new ZoneSelect());
 
-	pCharacteristic = pService->createCharacteristic(ADDR_BRIGHTNESS,BLECharacteristic::PROPERTY_WRITE);
-	pCharacteristic->setCallbacks(new ADDRBrightness());
+	pCharacteristic = pService->createCharacteristic(LED_MODE_SELECT,BLECharacteristic::PROPERTY_WRITE);
+	pCharacteristic->setCallbacks(new ModeSelect());
 
- 	pCharacteristic = pService->createCharacteristic(ADDR_ZONE1,BLECharacteristic::PROPERTY_WRITE);
-	pCharacteristic->setCallbacks(new ADDRPart1());
+	pCharacteristic = pService->createCharacteristic(LED_EFFECT_SELECT,BLECharacteristic::PROPERTY_WRITE);
+	pCharacteristic->setCallbacks(new EffectSelect());
 
-	pCharacteristic = pService->createCharacteristic(ADDR_ZONE2,BLECharacteristic::PROPERTY_WRITE);
-	pCharacteristic->setCallbacks(new ADDRPart2());
+	pCharacteristic = pService->createCharacteristic(LED_COLOR,BLECharacteristic::PROPERTY_WRITE);
+	pCharacteristic->setCallbacks(new ColorSelect());
 
-	pCharacteristic = pService->createCharacteristic(ADDR_ZONE3,BLECharacteristic::PROPERTY_WRITE);
-	pCharacteristic->setCallbacks(new ADDRPart3());
+ 	pCharacteristic = pService->createCharacteristic(LED_SPEED,BLECharacteristic::PROPERTY_WRITE);
+	pCharacteristic->setCallbacks(new SpeedSelect());
 
 	pService->start();
 	//BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
