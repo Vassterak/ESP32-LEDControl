@@ -1,6 +1,12 @@
 #include <Arduino.h>
+#include "definitions.h"
+#include <FastLED.h>
 class ClasicLEDStrip
 {
     public:
-    void SolidColor(uint8_t R, uint8_t G, uint8_t B);
+        CHSV currentColor;
+        void SolidColor(CHSV color);
+        void Rainbow(CHSV color, uint8_t speed);
+
+    private:
 };

@@ -1,4 +1,4 @@
-/* #include <Arduino.h>
+/* #include <Arduino.h> //Already inclued in my files
 #include <FastLED.h> */
 #include <BLEDevice.h>
 #include <BLEUtils.h>
@@ -12,7 +12,7 @@
 //Variables and Classes-------------------------------------------------------------
 bool preState = 0; //for the button
 
-ClasicLEDStrip _classicLEDStrip;
+ClasicLEDStrip _classicLEDStrip1;
 AddresableLED _addresableLED;
 
 class ZoneSelect: public BLECharacteristicCallbacks
@@ -20,17 +20,17 @@ class ZoneSelect: public BLECharacteristicCallbacks
 	//Called when data is sent to ESP32 for process
     void onWrite(BLECharacteristic *pCharacteristic)
 	{
-		switch (ProccesingFunctions::IDInputProcessing(pCharacteristic->getValue()))
+		switch (ProccesingFunctions::InputIDProcessing(pCharacteristic->getValue()))
 		{
-		case 1:
+		case 1: //Right side of the bed
 
 			break;
 
-		case 2:
+		case 2: //Front side
 
 			break;
 
-		case 3:
+		case 3: //Left side
 
 			break;
 
@@ -45,17 +45,17 @@ class ModeSelect: public BLECharacteristicCallbacks
 	//Called when data is sent to ESP32 for process
     void onWrite(BLECharacteristic *pCharacteristic2)
 	{
-		switch (ProccesingFunctions::IDInputProcessing(pCharacteristic2->getValue()))
+		switch (ProccesingFunctions::InputIDProcessing(pCharacteristic2->getValue()))
 		{
-		case 1:
+		case 1: //Classic strip
 
 			break;
 
-		case 2:
+		case 2: //Addressable strip whole
 
 			break;
 
-		case 3:
+		case 3: //Addressable strip zones
 
 			break;
 
@@ -79,7 +79,15 @@ class ColorSelect: public BLECharacteristicCallbacks
 	//Called when data is sent to ESP32 for process
     void onWrite(BLECharacteristic *pCharacteristic4)
 	{
+		Serial.println("Barva přijata");
+		_classicLEDStrip1.currentColor = ProccesingFunctions::InputColorProcessing(pCharacteristic4->getValue());
 
+		Serial.print("Hue: ");
+		Serial.println(_classicLEDStrip1.currentColor.hue);
+		Serial.print("Satur: ");
+		Serial.println(_classicLEDStrip1.currentColor.saturation);
+		Serial.print("Value: ");
+		Serial.println(_classicLEDStrip1.currentColor.value);
     }
 };
 
@@ -163,44 +171,8 @@ void loop()
 
 	EVERY_N_MILLISECONDS(20) //20ms = 50FPS
 	{
-/* 		for (uint8_t i = 0; i < 255; i +=5)
-		{
-			ledcWrite(PWMChannelR, i);
-			ledcWrite(PWMChannelG, 255-i);
-		} */
-	
-	/* 	switch (btIDCode)
-		{
-			case 110:
-				_addresableLED.FallingStars(10, CRGB(10,100,250));
-				break;
-
-			case 111:
-				_addresableLED.FallingStars(20, CRGB(200,10,2));
-				break;
-
-			case 112:
-				_addresableLED.AnimeRainbow(20, 1);
-				break;
-
-			case 113:
-				_addresableLED.AnimeRainbow(40, 1);
-			break;
-
-			case 114:
-				_addresableLED.AnimeRainbow(60, 2);
-			break;
-
-			case 115:
-			break;
-
-			default:
-				break;
-		} */
-
-
-
 		FastLED.show();
+		_classicLEDStrip1.SolidColor(_classicLEDStrip1.currentColor);
   	}
 
 	EVERY_N_SECONDS(5)

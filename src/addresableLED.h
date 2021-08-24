@@ -5,14 +5,15 @@ class AddresableLED
 {
     public:
     CRGB leds[LEDS_TOTAL_NUMBER];
+    CHSV currentColor;
+
+
     AddresableLED()
     {
         FastLED.addLeds<NEOPIXEL,LEDS_DATA_PIN>(leds, LEDS_TOTAL_NUMBER);
     }
 
     void SolidPart(CHSV color, int fromZone, int toZone); //right side of bed
-    void SolidPart2(CHSV color); //center
-    void SolidPart3(CHSV color); //left side of bed
 
     // whole strip
     void StaticRainbow(uint8_t HUEIncrementor);
