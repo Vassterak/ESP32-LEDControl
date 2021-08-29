@@ -12,8 +12,10 @@
 //Variables and Classes-------------------------------------------------------------
 bool preState = 0; //for the button
 uint8_t currentMode;
+BLEClient* getStatus;
+bool isConnected;
 
-ClasicLEDStrip _classicLEDStrip1;
+ClassicLEDStrip _classicLEDStrip1;
 AddresableLED _addresableLED;
 
 class ModeSelect: public BLECharacteristicCallbacks
@@ -76,6 +78,8 @@ class EffectSelect: public BLECharacteristicCallbacks
     void onWrite(BLECharacteristic *pCharacteristic3)
 	{
 		_classicLEDStrip1.currentEffectID = ProccesingFunctions::InputIDProcessing(pCharacteristic3->getValue());
+		Serial.print("Effect přijat: ");
+		Serial.println(_classicLEDStrip1.currentEffectID); 
     }
 };
 
@@ -174,11 +178,37 @@ void loop()
 	{
 		//FastLED.show();
 		//_classicLEDStrip1.SolidColor(_classicLEDStrip1.currentColor);
-		
+		if (currentMode == 1 )
+		{
+			Serial.println("tohle funguje?!");
+
+			switch (_classicLEDStrip1.currentEffectID)
+			{
+				case 1:
+					_classicLEDStrip1.SolidColor(_classicLEDStrip1.currentColor);
+					break;
+
+				case 2:
+					_classicLEDStrip1.Breathing(_classicLEDStrip1.currentColor, _classicLEDStrip1.currentSpeed);
+					break;
+
+				case 3:
+					_classicLEDStrip1.Rainbow(_classicLEDStrip1.currentSpeed);
+					break;
+				case 4:
+
+					break;
+
+				default:
+					break;
+			}
+		}
+		_classicLEDStrip1.Update();
   	}
 
 	EVERY_N_SECONDS(5)
 	{
+
 		Serial.print("Free heap: ");
 		Serial.print(ESP.getFreeHeap());
 		Serial.println("kB");

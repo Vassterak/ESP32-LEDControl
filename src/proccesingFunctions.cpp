@@ -5,7 +5,7 @@ uint16_t ProccesingFunctions::InputIDProcessing(std::string input)
 {
 	if (input.length() > 0)
 	{
-		Serial.println(atoi(input.c_str()));
+		//Serial.println(atoi(input.c_str()));
 		return atoi(input.c_str());
 	}
 
