@@ -11,34 +11,10 @@
 
 //Variables and Classes-------------------------------------------------------------
 bool preState = 0; //for the button
+uint8_t currentMode;
 
 ClasicLEDStrip _classicLEDStrip1;
 AddresableLED _addresableLED;
-
-class ZoneSelect: public BLECharacteristicCallbacks
-{
-	//Called when data is sent to ESP32 for process
-    void onWrite(BLECharacteristic *pCharacteristic)
-	{
-		switch (ProccesingFunctions::InputIDProcessing(pCharacteristic->getValue()))
-		{
-		case 1: //Right side of the bed
-
-			break;
-
-		case 2: //Front side
-
-			break;
-
-		case 3: //Left side
-
-			break;
-
-		default:
-			break;
-		}
-    }
-};
 
 class ModeSelect: public BLECharacteristicCallbacks
 {
@@ -48,19 +24,48 @@ class ModeSelect: public BLECharacteristicCallbacks
 		switch (ProccesingFunctions::InputIDProcessing(pCharacteristic2->getValue()))
 		{
 		case 1: //Classic strip
-
+			currentMode = 1;
 			break;
 
 		case 2: //Addressable strip whole
-
+			currentMode = 2;
 			break;
 
 		case 3: //Addressable strip zones
-
+			currentMode = 3;
 			break;
 
 		default:
 			break;
+		}
+    }
+};
+
+class ZoneSelect: public BLECharacteristicCallbacks
+{
+	//Called when data is sent to ESP32 for process
+    void onWrite(BLECharacteristic *pCharacteristic)
+	{
+		if (currentMode == 3)
+		{
+			switch (ProccesingFunctions::InputIDProcessing(pCharacteristic->getValue()))
+			{
+				case 1: //Right side of the bed
+				
+					break;
+
+				case 2: //Front side
+
+					break;
+
+				case 3: //Left side
+
+					break;
+
+				default:
+
+					break;
+			}
 		}
     }
 };
@@ -70,7 +75,7 @@ class EffectSelect: public BLECharacteristicCallbacks
 	//Called when data is sent to ESP32 for process
     void onWrite(BLECharacteristic *pCharacteristic3)
 	{
-		
+		_classicLEDStrip1.currentEffectID = ProccesingFunctions::InputIDProcessing(pCharacteristic3->getValue());
     }
 };
 
@@ -96,7 +101,7 @@ class SpeedSelect: public BLECharacteristicCallbacks
 	//Called when data is sent to ESP32 for process
     void onWrite(BLECharacteristic *pCharacteristic5)
 	{
-
+		_classicLEDStrip1.currentSpeed = ProccesingFunctions::InputIDProcessing(pCharacteristic5->getValue());
     }
 };
 
@@ -159,20 +164,17 @@ void loop()
   //Button-------------------------------------------------------------------
 	if (digitalRead(BUTTON_PIN) == HIGH && preState == 0)
 	{
-/* 		counter++;
-		Serial.println(String(counter)); */
 		preState = 1;
 		ESP.restart();
 	}
 	else if (digitalRead(BUTTON_PIN) == LOW)
-	{
 		preState = 0;
-	}
 
 	EVERY_N_MILLISECONDS(20) //20ms = 50FPS
 	{
-		FastLED.show();
-		_classicLEDStrip1.SolidColor(_classicLEDStrip1.currentColor);
+		//FastLED.show();
+		//_classicLEDStrip1.SolidColor(_classicLEDStrip1.currentColor);
+		
   	}
 
 	EVERY_N_SECONDS(5)

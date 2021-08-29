@@ -2,14 +2,19 @@
 
 void ClasicLEDStrip::SolidColor(CHSV color)
 {
-    CRGB rgbOutput;
-    hsv2rgb_rainbow(color, rgbOutput); //converting HSV to RGB color scheme.
+    currentColor = color;
+};
+
+void ClasicLEDStrip::Rainbow(uint8_t speed)
+{
+    currentColor.hue += speed;
+    currentColor.saturation = 255;
+};
+
+void ClasicLEDStrip::Update()
+{
+    hsv2rgb_rainbow(currentColor, rgbOutput); //converting HSV to RGB color scheme.
     ledcWrite(PWMChannelR, rgbOutput.red);
     ledcWrite(PWMChannelG, rgbOutput.green);
     ledcWrite(PWMChannelB, rgbOutput.blue);
-};
-
-void ClasicLEDStrip::Rainbow(CHSV color, uint8_t speed)
-{
-    
 }
