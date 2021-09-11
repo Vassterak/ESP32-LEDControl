@@ -37,3 +37,6 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+
+#BLE UUIDs folder with global settings
+src/definitions.h
