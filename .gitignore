@@ -39,4 +39,4 @@
 .vscode/ipch
 
 #BLE UUIDs folder with global settings
-src/definitions.h
+#src/definitions.h
