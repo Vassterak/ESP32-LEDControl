@@ -5,7 +5,7 @@ class AddresableLED
 {
     public:
     CRGB leds[LEDS_TOTAL_NUMBER];
-    CHSV currentColor;
+    CHSV currentColors[3];
 
 
     AddresableLED()

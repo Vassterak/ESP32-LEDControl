@@ -4,15 +4,21 @@
 class ClassicLEDStrip
 {
     public:
-        CHSV currentColor;
-        uint8_t currentSpeed = 0;
+        bool newColor = false;
+        CHSV setColors[3];
+        CHSV outputColor;
+        uint8_t numberOfColors = 1;
+        uint8_t currentSpeed = 1;
         uint8_t currentEffectID = 0;
-        void SolidColor(CHSV color);
-        void Breathing(CHSV color, uint8_t speed);
-        void Rainbow(uint8_t speed);
+        uint8_t maxBrightness = 0;
+        void SolidColor();
+        void Breathing();
+        void Breathing2();
+        void Rainbow();
         void Update();
 
     private:
-        bool helpVariable = false;
+        bool helpBoolean = false;
+        uint8_t helpInt = 0;
         CRGB rgbOutput;
 };

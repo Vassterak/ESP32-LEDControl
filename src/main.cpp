@@ -12,8 +12,9 @@
 //Variables and Classes-------------------------------------------------------------
 bool preState = 0; //for the button
 uint8_t currentMode;
-BLEClient* getStatus;
-bool isConnected;
+
+/* BLEClient* getStatus;
+bool isConnected; */
 
 ClassicLEDStrip _classicLEDStrip1;
 AddresableLED _addresableLED;
@@ -88,15 +89,25 @@ class ColorSelect: public BLECharacteristicCallbacks
 	//Called when data is sent to ESP32 for process
     void onWrite(BLECharacteristic *pCharacteristic4)
 	{
-		Serial.println("Barva přijata");
-		_classicLEDStrip1.currentColor = ProccesingFunctions::InputColorProcessing(pCharacteristic4->getValue());
+		std::tie(_classicLEDStrip1.setColors[0], _classicLEDStrip1.setColors[1], _classicLEDStrip1.setColors[2], _classicLEDStrip1.numberOfColors) =
+			ProccesingFunctions::InputMultipleColorProcessing(pCharacteristic4->getValue());
+		_classicLEDStrip1.newColor = true;
 
-		Serial.print("Hue: ");
-		Serial.println(_classicLEDStrip1.currentColor.hue);
-		Serial.print("Satur: ");
-		Serial.println(_classicLEDStrip1.currentColor.saturation);
-		Serial.print("Value: ");
-		Serial.println(_classicLEDStrip1.currentColor.value);
+		Serial.print("počet barev: ");
+		Serial.println(_classicLEDStrip1.numberOfColors);
+
+		for (uint8_t i = 0; i < 3; i++)
+		{
+			Serial.print("Hue: ");
+			Serial.println(_classicLEDStrip1.setColors[i].hue);
+
+			Serial.print("Satur: ");
+			Serial.println(_classicLEDStrip1.setColors[i].saturation);
+
+			Serial.print("Value: ");
+			Serial.println(_classicLEDStrip1.setColors[i].value);
+			Serial.println("------------------------------------------");
+		}
     }
 };
 
@@ -106,7 +117,9 @@ class SpeedSelect: public BLECharacteristicCallbacks
     void onWrite(BLECharacteristic *pCharacteristic5)
 	{
 		_classicLEDStrip1.currentSpeed = ProccesingFunctions::InputIDProcessing(pCharacteristic5->getValue());
-    }
+		Serial.print("Rychlost: ");
+		Serial.println(_classicLEDStrip1.currentSpeed);
+	}
 };
 
 
@@ -169,7 +182,7 @@ void loop()
 	if (digitalRead(BUTTON_PIN) == HIGH && preState == 0)
 	{
 		preState = 1;
-		ESP.restart();
+ 		ESP.restart();
 	}
 	else if (digitalRead(BUTTON_PIN) == LOW)
 		preState = 0;
@@ -180,20 +193,18 @@ void loop()
 		//_classicLEDStrip1.SolidColor(_classicLEDStrip1.currentColor);
 		if (currentMode == 1 )
 		{
-			Serial.println("tohle funguje?!");
-
 			switch (_classicLEDStrip1.currentEffectID)
 			{
 				case 1:
-					_classicLEDStrip1.SolidColor(_classicLEDStrip1.currentColor);
+					_classicLEDStrip1.SolidColor();
 					break;
 
 				case 2:
-					_classicLEDStrip1.Breathing(_classicLEDStrip1.currentColor, _classicLEDStrip1.currentSpeed);
+					_classicLEDStrip1.Breathing2();
 					break;
 
 				case 3:
-					_classicLEDStrip1.Rainbow(_classicLEDStrip1.currentSpeed);
+					_classicLEDStrip1.Rainbow();
 					break;
 				case 4:
 
