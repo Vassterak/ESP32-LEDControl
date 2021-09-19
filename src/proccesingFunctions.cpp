@@ -1,7 +1,8 @@
 #include "proccesingFunctions.h"
 #include <tuple>
 
-uint16_t ProccesingFunctions::InputIDProcessing(std::string input)						//simple conversion from string to int.
+//simple conversion from string to int.
+uint16_t ProccesingFunctions::InputIDProcessing(std::string input)
 {
 	if (input.length() > 0)
 		return atoi(input.c_str()); 
@@ -10,7 +11,8 @@ uint16_t ProccesingFunctions::InputIDProcessing(std::string input)						//simple
 		return 0;
 };
 
-CHSV ProccesingFunctions::InputColorProcessing(std::string input) 						//Old method for one color only
+//Old method for one color only
+CHSV ProccesingFunctions::InputColorProcessing(std::string input)
 {
 	std::string colors[3];
 	uint8_t output[3];
@@ -20,19 +22,19 @@ CHSV ProccesingFunctions::InputColorProcessing(std::string input) 						//Old me
 	{
 		for (uint8_t i = 0; i <= input.length(); i++)
 		{
-			if (std::isdigit(input[i])) 												//check if char is number
-				colors[id] += input[i]; 												//put the number into the colors array
+			if (std::isdigit(input[i])) 			//check if char is number
+				colors[id] += input[i]; 			//put the number into the colors array
 
-			else if (input[i] == '_' && id < 4 ) 										//when the spacer is detected, it will increte the id value. So the next number is placed into the correct array's element/part. You know what I mean.
-				id++;
+			else if (input[i] == '_' && id < 4 ) 	//when the spacer is detected, it will increte the id value.
+				id++;								//So the next number is placed into the correct array's element/part. You know what I mean.
 
 			else
 				break;
 		}
 		
-		for (uint8_t i = 0; i < sizeof(colors)/sizeof(*colors) ; i++) 					//get the number of elements in array and convert the string array into int array. So it can be returned as complete color.
-			output[i] = atoi(colors[i].c_str());
-		
+		for (uint8_t i = 0; i < sizeof(colors)/sizeof(*colors) ; i++) 	//get the number of elements in array and convert the string array into int array.
+			output[i] = atoi(colors[i].c_str());						//So it can be returned as complete color.
+
 		return CHSV(output[0],output[1], output[2]);
 	}
 
@@ -46,8 +48,8 @@ std::tuple<CHSV, CHSV, CHSV, uint8_t> ProccesingFunctions::InputMultipleColorPro
 	Serial.print("Received string: ");
 	Serial.println(input.c_str());
 
-	CHSV colors[3] = {CHSV(0, 0, 0), CHSV(0, 0, 0), CHSV(0, 0, 0)}; 					//initializing empty color array, each element is one color.
-	char output[9][4] = {'\0'};															//initializing empty char array, that will hold parsed values from input string
+	CHSV colors[3] = {CHSV(0, 0, 0), CHSV(0, 0, 0), CHSV(0, 0, 0)}; 	//initializing empty color array, each element is one color.
+	char output[9][4] = {'\0'};											//initializing empty char array, that will hold parsed values from input string
 	uint8_t valuePosition = 0;	
 	uint8_t currentID = 0;
 	uint8_t numberOfColors = 1;
@@ -58,15 +60,15 @@ std::tuple<CHSV, CHSV, CHSV, uint8_t> ProccesingFunctions::InputMultipleColorPro
 		{
 			if (isdigit(input[i]))
 			{
-				output[currentID][valuePosition] = input[i];
+				output[currentID][valuePosition] = input[i]; //each digit is saved into 2D array, where rows are whole values and collum is char of single number.
 				valuePosition++;
 			}
-			else if (input[i] == '_')
+			else if (input[i] == '_') //space between color information
 			{
 				valuePosition = 0;
 				currentID++;
 			}
-			else if (input[i] == '-')
+			else if (input[i] == '-') //space between each color, new '-' means next color
 			{
 				numberOfColors++;
 				valuePosition = 0;
@@ -74,7 +76,7 @@ std::tuple<CHSV, CHSV, CHSV, uint8_t> ProccesingFunctions::InputMultipleColorPro
 			}
 		}
 
-		colors[0] = CHSV(atoi(output[0]), atoi(output[1]), atoi(output[2])); 			//...no comment for this inefficiency
+		colors[0] = CHSV(atoi(output[0]), atoi(output[1]), atoi(output[2])); //...no comment for this inefficiency
 		if (numberOfColors > 1)
 		{
 			colors[1] = CHSV(atoi(output[3]), atoi(output[4]), atoi(output[5]));
@@ -89,4 +91,3 @@ std::tuple<CHSV, CHSV, CHSV, uint8_t> ProccesingFunctions::InputMultipleColorPro
 	else
 		return std::make_tuple(CHSV(0, 0, 0), CHSV(0, 0, 0), CHSV(0, 0, 0), 0);
 };
-

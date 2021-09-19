@@ -14,6 +14,8 @@ class ClassicLEDStrip
         void SolidColor();
         void Breathing();
         void Breathing2();
+        void Blending();
+        void Pulsing();
         void Rainbow();
         void Update();
 

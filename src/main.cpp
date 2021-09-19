@@ -207,7 +207,7 @@ void loop()
 					_classicLEDStrip1.Rainbow();
 					break;
 				case 4:
-
+					_classicLEDStrip1.Blending();
 					break;
 
 				default:

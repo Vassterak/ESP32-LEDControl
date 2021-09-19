@@ -1,9 +1,5 @@
 #include "addresableLED.h"
 
-enum{
-
-};
-
 void AddresableLED::SolidPart(CHSV color, int fromZone, int toZone)
 {
     fill_solid(leds+fromZone, toZone, color);
