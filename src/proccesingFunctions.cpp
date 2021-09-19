@@ -11,7 +11,7 @@ uint16_t ProccesingFunctions::InputIDProcessing(std::string input)
 		return 0;
 };
 
-//Old method for one color only
+//OLD METHOD, NOT USED. For one color only
 CHSV ProccesingFunctions::InputColorProcessing(std::string input)
 {
 	std::string colors[3];
@@ -42,17 +42,15 @@ CHSV ProccesingFunctions::InputColorProcessing(std::string input)
 		return CHSV(0,0,0);
 };
 
-//horribly inefficient method for convertion, I'm awere of that. If it works don't touch it. Just a joke I'll fix it later...
+//CURRENT METHOD. Horribly inefficient method for convertion, I'm awere of that. If it works don't touch it. Just a joke I'll fix it later...
 std::tuple<CHSV, CHSV, CHSV, uint8_t> ProccesingFunctions::InputMultipleColorProcessing(std::string input)
 {
-	Serial.print("Received string: ");
-	Serial.println(input.c_str());
+/* 	Serial.print("Received string: ");
+	Serial.println(input.c_str()); */
 
 	CHSV colors[3] = {CHSV(0, 0, 0), CHSV(0, 0, 0), CHSV(0, 0, 0)}; 	//initializing empty color array, each element is one color.
 	char output[9][4] = {'\0'};											//initializing empty char array, that will hold parsed values from input string
-	uint8_t valuePosition = 0;	
-	uint8_t currentID = 0;
-	uint8_t numberOfColors = 1;
+	uint8_t valuePosition = 0, currentID = 0, numberOfColors = 1;
 
 	if (input.length() > 0)
 	{
@@ -76,7 +74,8 @@ std::tuple<CHSV, CHSV, CHSV, uint8_t> ProccesingFunctions::InputMultipleColorPro
 			}
 		}
 
-		colors[0] = CHSV(atoi(output[0]), atoi(output[1]), atoi(output[2])); //...no comment for this inefficiency
+		colors[0] = CHSV(atoi(output[0]), atoi(output[1]), atoi(output[2])); //one color is send always
+
 		if (numberOfColors > 1)
 		{
 			colors[1] = CHSV(atoi(output[3]), atoi(output[4]), atoi(output[5]));
