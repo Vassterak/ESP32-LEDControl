@@ -39,6 +39,7 @@ void ClassicLEDStrip::Breathing2()
             setColors[i].value = 0;
         
         helpInt = 0;
+        helpInt2 = 0;
         newColor = false;
         helpBoolean = false;
     }
@@ -124,7 +125,37 @@ void ClassicLEDStrip::Blending()
 
 void ClassicLEDStrip::Pulsing()
 {
+    if (newColor)
+    {
+        maxBrightness = setColors[0].value;
 
+        for (uint8_t i = 0; i < numberOfColors; i++) //set initial brightness level for all colors to 0
+            setColors[i].value = 0;
+
+        helpInt = 0;
+        helpInt2 = 0;
+        helpBoolean = false;
+        newColor = false;
+    }
+
+    if ((helpInt + currentSpeed) > 255)
+    {
+        helpInt = 255;
+
+        if (!helpBoolean)
+        {
+            helpInt2++;
+            if (helpInt2 >= numberOfColors)
+                helpInt2 = 0;
+        }
+
+        helpBoolean = !helpBoolean;
+    }
+
+    helpBoolean ? setColors[helpInt2].value = maxBrightness : setColors[helpInt2].value = 0;
+
+    helpInt += currentSpeed;
+    outputColor = setColors[helpInt2];
 };
 
 void ClassicLEDStrip::Update()

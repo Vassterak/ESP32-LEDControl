@@ -210,6 +210,10 @@ void loop()
 					_classicLEDStrip1.Blending();
 					break;
 
+				case 5:
+					_classicLEDStrip1.Pulsing();
+					break;
+
 				default:
 					break;
 			}
