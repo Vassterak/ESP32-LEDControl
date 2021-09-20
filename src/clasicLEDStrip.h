@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "definitions.h"
 #include <FastLED.h>
+
 class ClassicLEDStrip
 {
     public:

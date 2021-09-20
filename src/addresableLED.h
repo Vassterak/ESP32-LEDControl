@@ -6,7 +6,7 @@ class AddresableLED
     public:
     CRGB leds[LEDS_TOTAL_NUMBER];
     CHSV currentColors[3];
-
+    uint8_t currentEffectID = 0;
 
     AddresableLED()
     {

@@ -2,6 +2,7 @@
 
 void ClassicLEDStrip::SolidColor()
 {
+    //runs only after the new color is received from mobile app.
     if (newColor)
     {
         outputColor = setColors[0];
@@ -13,9 +14,7 @@ void ClassicLEDStrip::SolidColor()
 void ClassicLEDStrip::Breathing()
 {
     if ((setColors[0].value + currentSpeed) < 255 && !helpBoolean)
-    {
         setColors[0].value += currentSpeed;
-    }
 
     else
     {
@@ -24,18 +23,20 @@ void ClassicLEDStrip::Breathing()
     }
 
     if ((setColors[0].value - currentSpeed) < 0)
-    {
         helpBoolean = false;
-    }
 };
 
+//Effect is used for changing brightness value from 0 to 255 in linear motion.
+//Each time a value gets to the 0 the color is swapped for a new one.
+//Then it's repating to the end of the array and after that starts all over again.
 void ClassicLEDStrip::Breathing2()
 {
+    //same as in "void ClassicLEDStrip::SolidColor()"
     if (newColor)
     {
         maxBrightness = setColors[0].value;
 
-        for (uint8_t i = 0; i < numberOfColors; i++) //set initial brightness level for all colors to 0
+        for (uint8_t i = 0; i < numberOfColors; i++)
             setColors[i].value = 0;
         
         helpInt = 0;
@@ -53,6 +54,7 @@ void ClassicLEDStrip::Breathing2()
         setColors[helpInt].value -= currentSpeed;
     }
 
+    //When value reach 0
     if ((setColors[helpInt].value - currentSpeed) < 0)
     {
         helpBoolean = false;
@@ -100,9 +102,8 @@ void ClassicLEDStrip::Blending()
         }
 
         if (helpInt2 == 2)
-        {
             outputColor = blend(setColors[helpInt2], setColors[0], helpInt);
-        }
+
         else
             outputColor = blend(setColors[helpInt2], setColors[helpInt2 + 1], helpInt);
 
@@ -111,14 +112,16 @@ void ClassicLEDStrip::Blending()
         if (helpBoolean)
         {
             helpInt2++;
+
             if (helpInt2 == 3)
                 helpInt2 = 0;
+
             helpBoolean = false;
         }
 
     }
 
-    //8bit sinusoidal wave for smooth color blending. 0 = setColors[0], 255 = setCorlos[1] betweeen 2 colors
+    //When there are only 2 colors. beatsin8 generates sinusodial wawe to oscilate between them.
     else 
         outputColor = blend(setColors[0], setColors[1], beatsin8(currentSpeed, 0,255));
 };
@@ -129,7 +132,7 @@ void ClassicLEDStrip::Pulsing()
     {
         maxBrightness = setColors[0].value;
 
-        for (uint8_t i = 0; i < numberOfColors; i++) //set initial brightness level for all colors to 0
+        for (uint8_t i = 0; i < numberOfColors; i++)
             setColors[i].value = 0;
 
         helpInt = 0;
@@ -160,7 +163,9 @@ void ClassicLEDStrip::Pulsing()
 
 void ClassicLEDStrip::Update()
 {
-    hsv2rgb_rainbow(outputColor, rgbOutput); //converting HSV to RGB color scheme.
+    //converting HSV to RGB color scheme.
+    hsv2rgb_rainbow(outputColor, rgbOutput);
+
     ledcWrite(PWMChannelR, rgbOutput.red);
     ledcWrite(PWMChannelG, rgbOutput.green);
     ledcWrite(PWMChannelB, rgbOutput.blue);

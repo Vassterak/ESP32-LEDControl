@@ -22,18 +22,19 @@ CHSV ProccesingFunctions::InputColorProcessing(std::string input)
 	{
 		for (uint8_t i = 0; i <= input.length(); i++)
 		{
-			if (std::isdigit(input[i])) 			//check if char is number
-				colors[id] += input[i]; 			//put the number into the colors array
+			if (std::isdigit(input[i]))
+				colors[id] += input[i];
 
-			else if (input[i] == '_' && id < 4 ) 	//when the spacer is detected, it will increte the id value.
-				id++;								//So the next number is placed into the correct array's element/part. You know what I mean.
+			else if (input[i] == '_' && id < 4 )
+				id++;
 
 			else
 				break;
 		}
-		
-		for (uint8_t i = 0; i < sizeof(colors)/sizeof(*colors) ; i++) 	//get the number of elements in array and convert the string array into int array.
-			output[i] = atoi(colors[i].c_str());						//So it can be returned as complete color.
+
+		//get the number of elements in array and convert the string array into int array.
+		for (uint8_t i = 0; i < sizeof(colors)/sizeof(*colors) ; i++)
+			output[i] = atoi(colors[i].c_str());
 
 		return CHSV(output[0],output[1], output[2]);
 	}
@@ -42,14 +43,11 @@ CHSV ProccesingFunctions::InputColorProcessing(std::string input)
 		return CHSV(0,0,0);
 };
 
-//CURRENT METHOD. Horribly inefficient method for convertion, I'm awere of that. If it works don't touch it. Just a joke I'll fix it later...
+//CURRENT METHOD. Not very efficient, need to be rewritten.
 std::tuple<CHSV, CHSV, CHSV, uint8_t> ProccesingFunctions::InputMultipleColorProcessing(std::string input)
 {
-/* 	Serial.print("Received string: ");
-	Serial.println(input.c_str()); */
-
-	CHSV colors[3] = {CHSV(0, 0, 0), CHSV(0, 0, 0), CHSV(0, 0, 0)}; 	//initializing empty color array, each element is one color.
-	char output[9][4] = {'\0'};											//initializing empty char array, that will hold parsed values from input string
+	CHSV colors[3] = {CHSV(0, 0, 0), CHSV(0, 0, 0), CHSV(0, 0, 0)};
+	char output[9][4] = {'\0'};
 	uint8_t valuePosition = 0, currentID = 0, numberOfColors = 1;
 
 	if (input.length() > 0)
@@ -58,15 +56,19 @@ std::tuple<CHSV, CHSV, CHSV, uint8_t> ProccesingFunctions::InputMultipleColorPro
 		{
 			if (isdigit(input[i]))
 			{
-				output[currentID][valuePosition] = input[i]; //each digit is saved into 2D array, where rows are whole values and collum is char of single number.
+				output[currentID][valuePosition] = input[i];
 				valuePosition++;
 			}
-			else if (input[i] == '_') //space between color information
+
+			//space between color information (hue_saturation_value)
+			else if (input[i] == '_')
 			{
 				valuePosition = 0;
 				currentID++;
 			}
-			else if (input[i] == '-') //space between each color, new '-' means next color
+
+			//space between each color, after '-' comes next color
+			else if (input[i] == '-')
 			{
 				numberOfColors++;
 				valuePosition = 0;
@@ -74,7 +76,7 @@ std::tuple<CHSV, CHSV, CHSV, uint8_t> ProccesingFunctions::InputMultipleColorPro
 			}
 		}
 
-		colors[0] = CHSV(atoi(output[0]), atoi(output[1]), atoi(output[2])); //one color is send always
+		colors[0] = CHSV(atoi(output[0]), atoi(output[1]), atoi(output[2]));
 
 		if (numberOfColors > 1)
 		{

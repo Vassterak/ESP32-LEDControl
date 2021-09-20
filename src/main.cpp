@@ -1,20 +1,15 @@
-/* #include <Arduino.h> //Already inclued in my files
-#include <FastLED.h> */
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
 
-//My files
-#include "addresableLED.h" //includes definitions.h
+//My files, these files also incule "definitions.h", <Arduino.h>, <FastLED.h>
+#include "addresableLED.h"
 #include "clasicLEDStrip.h"
 #include "proccesingFunctions.h"
 
 //Variables and Classes-------------------------------------------------------------
 bool preState = 0; //for the button
 uint8_t currentMode;
-
-/* BLEClient* getStatus;
-bool isConnected; */
 
 ClassicLEDStrip _classicLEDStrip1;
 AddresableLED _addresableLED;
@@ -53,20 +48,19 @@ class ZoneSelect: public BLECharacteristicCallbacks
 		{
 			switch (ProccesingFunctions::InputIDProcessing(pCharacteristic->getValue()))
 			{
-				case 1: //Right side of the bed
-				
+				//Right side of the bed
+				case 1:
 					break;
 
-				case 2: //Front side
-
+				//Center side of the bed
+				case 2:
 					break;
 
-				case 3: //Left side
-
+				//Left side
+				case 3:
 					break;
 
 				default:
-
 					break;
 			}
 		}
@@ -127,7 +121,7 @@ void setup()
 {
 	pinMode(BUTTON_PIN, INPUT_PULLDOWN); //input for the test button
 
-//SETUP for clasic led strip controlled by MOSFET, Gate is driven by PWM from defined pins
+	//SETUP for clasic led strip controlled by MOSFET, Gate is driven by PWM from defined pins
 	pinMode(LED_R, OUTPUT);
 	pinMode(LED_G, OUTPUT);
 	pinMode(LED_B, OUTPUT);
@@ -165,7 +159,7 @@ void setup()
 	//BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
 	BLEAdvertising *pAdvertising = pServer->getAdvertising();
 
-	//functions that help with iPhone connections issue
+	//functions that help with iPhone connections issue (I HAVE NEVER TRIED.)
 /* 	pAdvertising->setMinPreferred(0x06);  
 	pAdvertising->setMinPreferred(0x12); */
 
@@ -223,7 +217,6 @@ void loop()
 
 	EVERY_N_SECONDS(5)
 	{
-
 		Serial.print("Free heap: ");
 		Serial.print(ESP.getFreeHeap());
 		Serial.println("kB");
