@@ -8,9 +8,9 @@ For Bluetooth communication: [BLE](https://www.arduino.cc/reference/en/libraries
 ### Hardware for circuit build:
 Check out: [Schematic](/docs/schematics/Schematic.pdf)
 - 12V power supply (max power depands how many LEDs strips you would like to drive. For me 50W (4A)).
-- Mini SMD step-down 12V => 5V for microcontroller.
+- [Mini SMD step-down 12V](/docs/media/stepdown.png) => 5V for microcontroller.
 - IoT ESP-WROOM-32 2.4GHz Dual-Mode CP2102 with 4MB Flash.
-- level shifter (not necessary, depends on your other components)
+- [level shifter](/docs/media/levelshifter.png) (required only if Addressable LED stip is not getting strong enought data signal, depends on your Microcontroller)
 - LEDs strips
 ### Software for controlling:
 Mobile app yet to be released.
