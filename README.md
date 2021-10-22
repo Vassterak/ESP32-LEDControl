@@ -23,7 +23,8 @@ Mobile app yet to be released.
 ![PlatfromIO Image2](docs/media/installation/install2.JPG)
 5. Check if you have all required libraries
 ![PlatfromIO Image3](docs/media/installation/install3.JPG)
-![PlatfromIO Image3](docs/media/installation/install4.JPG)
+![PlatfromIO Image3](docs/media/installation/install4.JPG)  
+6. Got to [Definitions](src/definitions.h) And add(generate) your own CHARACTERISTIC_UUIDs.
 
 ## Files explanation
 no_ota.csv => file that sets correct partition sizes, needed because BLE library is quite huge. [More info](https://iotespresso.com/how-to-set-partitions-in-esp32/).  
