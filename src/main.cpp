@@ -1,6 +1,7 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
+#include <BLESecurity.h>
 
 //My files, these files also incule "definitions.h", <Arduino.h>, <FastLED.h>
 #include "addresableLED.h"
@@ -22,15 +23,21 @@ class ModeSelect: public BLECharacteristicCallbacks
 		switch (ProccesingFunctions::InputIDProcessing(pCharacteristic2->getValue()))
 		{
 		case 1: //Classic strip
+			Serial.print("Selected Mode: ");
+			Serial.println("1");
 			currentMode = 1;
 			break;
 
 		case 2: //Addressable strip whole
 			currentMode = 2;
+			Serial.print("Selected Mode: ");
+			Serial.println("2");
 			break;
 
 		case 3: //Addressable strip zones
 			currentMode = 3;
+			Serial.print("Selected Mode: ");
+			Serial.println("3");
 			break;
 
 		default:
@@ -50,17 +57,25 @@ class ZoneSelect: public BLECharacteristicCallbacks
 			{
 				//Right side of the bed
 				case 1:
+					Serial.print("Selected Zone: ");
+					Serial.println("1");
 					break;
 
 				//Center side of the bed
 				case 2:
+					Serial.print("Selected Zone: ");
+					Serial.println("2");
 					break;
 
 				//Left side
 				case 3:
+					Serial.print("Selected Zone: ");
+					Serial.println("3");
 					break;
 
 				default:
+					Serial.print("Selected Zone: ");
+					Serial.println("None");
 					break;
 			}
 		}
@@ -73,7 +88,7 @@ class EffectSelect: public BLECharacteristicCallbacks
     void onWrite(BLECharacteristic *pCharacteristic3)
 	{
 		_classicLEDStrip1.currentEffectID = ProccesingFunctions::InputIDProcessing(pCharacteristic3->getValue());
-		Serial.print("Effect přijat: ");
+		Serial.print("Selected Effect: ");
 		Serial.println(_classicLEDStrip1.currentEffectID); 
     }
 };
@@ -87,7 +102,7 @@ class ColorSelect: public BLECharacteristicCallbacks
 			ProccesingFunctions::InputMultipleColorProcessing(pCharacteristic4->getValue());
 		_classicLEDStrip1.newColor = true;
 
-		Serial.print("počet barev: ");
+		Serial.print("Number of colors: ");
 		Serial.println(_classicLEDStrip1.numberOfColors);
 
 		for (uint8_t i = 0; i < 3; i++)
@@ -111,7 +126,7 @@ class SpeedSelect: public BLECharacteristicCallbacks
     void onWrite(BLECharacteristic *pCharacteristic5)
 	{
 		_classicLEDStrip1.currentSpeed = ProccesingFunctions::InputIDProcessing(pCharacteristic5->getValue());
-		Serial.print("Rychlost: ");
+		Serial.print("Speed: ");
 		Serial.println(_classicLEDStrip1.currentSpeed);
 	}
 };
@@ -119,7 +134,7 @@ class SpeedSelect: public BLECharacteristicCallbacks
 
 void setup()
 {
-	pinMode(BUTTON_PIN, INPUT_PULLDOWN); //input for the test button
+ 	pinMode(BUTTON_PIN, INPUT_PULLDOWN); //input for the test button
 
 	//SETUP for clasic led strip controlled by MOSFET, Gate is driven by PWM from defined pins
 	pinMode(LED_R, OUTPUT);
@@ -156,12 +171,12 @@ void setup()
 	pCharacteristic->setCallbacks(new SpeedSelect());
 
 	pService->start();
-	//BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
 	BLEAdvertising *pAdvertising = pServer->getAdvertising();
+	//BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
 
 	//functions that help with iPhone connections issue (I HAVE NEVER TRIED.)
-/* 	pAdvertising->setMinPreferred(0x06);  
-	pAdvertising->setMinPreferred(0x12); */
+ 	//pAdvertising->setMinPreferred(0x06);  
+	//pAdvertising->setMinPreferred(0x12);
 
 	pAdvertising->start();
 
