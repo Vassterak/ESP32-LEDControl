@@ -2,7 +2,7 @@
 #include <tuple>
 
 //simple conversion from string to int.
-uint16_t ProccesingFunctions::InputIDProcessing(std::string input)
+uint16_t ProccesingFunctions::inputIDProcessing(std::string input)
 {
 	if (input.length() > 0)
 		return atoi(input.c_str()); 
@@ -12,7 +12,7 @@ uint16_t ProccesingFunctions::InputIDProcessing(std::string input)
 };
 
 //OLD METHOD, NOT USED. For one color only
-CHSV ProccesingFunctions::InputColorProcessing(std::string input)
+CHSV ProccesingFunctions::inputColorProcessing(std::string input)
 {
 	std::string colors[3];
 	uint8_t output[3];
@@ -44,7 +44,7 @@ CHSV ProccesingFunctions::InputColorProcessing(std::string input)
 };
 
 //CURRENT METHOD. Not very efficient, need to be rewritten.
-std::tuple<CHSV, CHSV, CHSV, uint8_t> ProccesingFunctions::InputMultipleColorProcessing(std::string input)
+std::tuple<CHSV, CHSV, CHSV, uint8_t> ProccesingFunctions::inputMultipleColorProcessing(std::string input)
 {
 	CHSV colors[3] = {CHSV(0, 0, 0), CHSV(0, 0, 0), CHSV(0, 0, 0)};
 	char output[9][4] = {'\0'};

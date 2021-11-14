@@ -9,13 +9,13 @@ class ClassicLEDStrip
         CHSV setColors[3];
         CHSV outputColor;
         uint8_t numberOfColors = 1, currentSpeed = 1, currentEffectID = 0, maxBrightness = 0;
-        void SolidColor();
-        void Breathing();
-        void Breathing2();
-        void Blending();
-        void Pulsing();
-        void Rainbow();
-        void Update();
+        void solidColor();
+        void breathing();
+        void breathing2();
+        void blending();
+        void pulsing();
+        void rainbow();
+        void update();
 
     private:
         bool helpBoolean = false;

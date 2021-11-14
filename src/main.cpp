@@ -10,17 +10,17 @@
 
 //Variables and Classes-------------------------------------------------------------
 bool preState = 0; //for the button
-uint8_t currentMode;
-
+uint8_t currentMode = 0;
 ClassicLEDStrip _classicLEDStrip1;
 AddresableLED _addresableLED;
 
-class ModeSelect: public BLECharacteristicCallbacks
+
+class ModeSelect : public BLECharacteristicCallbacks //BLECharacteristicCallbacks runs on CORE 0
 {
 	//Called when data is sent to ESP32 for process
     void onWrite(BLECharacteristic *pCharacteristic2)
 	{
-		switch (ProccesingFunctions::InputIDProcessing(pCharacteristic2->getValue()))
+		switch (ProccesingFunctions::inputIDProcessing(pCharacteristic2->getValue()))
 		{
 		case 1: //Classic strip
 			Serial.print("Selected Mode: ");
@@ -43,17 +43,16 @@ class ModeSelect: public BLECharacteristicCallbacks
 		default:
 			break;
 		}
-    }
+	}
 };
 
-class ZoneSelect: public BLECharacteristicCallbacks
+class ZoneSelect : public BLECharacteristicCallbacks //BLECharacteristicCallbacks runs on CORE 0
 {
-	//Called when data is sent to ESP32 for process
     void onWrite(BLECharacteristic *pCharacteristic)
 	{
 		if (currentMode == 3)
 		{
-			switch (ProccesingFunctions::InputIDProcessing(pCharacteristic->getValue()))
+			switch (ProccesingFunctions::inputIDProcessing(pCharacteristic->getValue()))
 			{
 				//Right side of the bed
 				case 1:
@@ -79,27 +78,26 @@ class ZoneSelect: public BLECharacteristicCallbacks
 					break;
 			}
 		}
-    }
+	}
 };
 
-class EffectSelect: public BLECharacteristicCallbacks
+class EffectSelect : public BLECharacteristicCallbacks //BLECharacteristicCallbacks runs on CORE 0
 {
-	//Called when data is sent to ESP32 for process
     void onWrite(BLECharacteristic *pCharacteristic3)
 	{
-		_classicLEDStrip1.currentEffectID = ProccesingFunctions::InputIDProcessing(pCharacteristic3->getValue());
+		_classicLEDStrip1.currentEffectID = ProccesingFunctions::inputIDProcessing(pCharacteristic3->getValue());
 		Serial.print("Selected Effect: ");
-		Serial.println(_classicLEDStrip1.currentEffectID); 
-    }
+		Serial.println(_classicLEDStrip1.currentEffectID);
+
+	}
 };
 
-class ColorSelect: public BLECharacteristicCallbacks
+class ColorSelect : public BLECharacteristicCallbacks //BLECharacteristicCallbacks runs on CORE 0
 {
-	//Called when data is sent to ESP32 for process
     void onWrite(BLECharacteristic *pCharacteristic4)
 	{
 		std::tie(_classicLEDStrip1.setColors[0], _classicLEDStrip1.setColors[1], _classicLEDStrip1.setColors[2], _classicLEDStrip1.numberOfColors) =
-			ProccesingFunctions::InputMultipleColorProcessing(pCharacteristic4->getValue());
+			ProccesingFunctions::inputMultipleColorProcessing(pCharacteristic4->getValue());
 		_classicLEDStrip1.newColor = true;
 
 		Serial.print("Number of colors: ");
@@ -117,17 +115,17 @@ class ColorSelect: public BLECharacteristicCallbacks
 			Serial.println(_classicLEDStrip1.setColors[i].value);
 			Serial.println("------------------------------------------");
 		}
-    }
+	}
 };
 
-class SpeedSelect: public BLECharacteristicCallbacks
+class SpeedSelect : public BLECharacteristicCallbacks //BLECharacteristicCallbacks runs on CORE 0
 {
-	//Called when data is sent to ESP32 for process
     void onWrite(BLECharacteristic *pCharacteristic5)
 	{
-		_classicLEDStrip1.currentSpeed = ProccesingFunctions::InputIDProcessing(pCharacteristic5->getValue());
+		_classicLEDStrip1.currentSpeed = ProccesingFunctions::inputIDProcessing(pCharacteristic5->getValue());
 		Serial.print("Speed: ");
 		Serial.println(_classicLEDStrip1.currentSpeed);
+
 	}
 };
 
@@ -185,7 +183,9 @@ void setup()
 
 };
 
-void loop() 
+
+
+void loop() //loop function works on CORE 1 (default settings)
 {
   //Button-------------------------------------------------------------------
 	if (digitalRead(BUTTON_PIN) == HIGH && preState == 0)
@@ -198,42 +198,41 @@ void loop()
 
 	EVERY_N_MILLISECONDS(20) //20ms = 50FPS
 	{
-		//FastLED.show();
-		//_classicLEDStrip1.SolidColor(_classicLEDStrip1.currentColor);
 		if (currentMode == 1 )
 		{
 			switch (_classicLEDStrip1.currentEffectID)
 			{
 				case 1:
-					_classicLEDStrip1.SolidColor();
+					_classicLEDStrip1.solidColor();
 					break;
 
 				case 2:
-					_classicLEDStrip1.Breathing2();
+					_classicLEDStrip1.breathing2();
 					break;
 
 				case 3:
-					_classicLEDStrip1.Rainbow();
+					_classicLEDStrip1.rainbow();
 					break;
 				case 4:
-					_classicLEDStrip1.Blending();
+					_classicLEDStrip1.blending();
 					break;
 
 				case 5:
-					_classicLEDStrip1.Pulsing();
+					_classicLEDStrip1.pulsing();
 					break;
 
 				default:
 					break;
 			}
 		}
-		_classicLEDStrip1.Update();
-  	}
+		_classicLEDStrip1.update();
+		//FastLED.show();
+	}
 
 	EVERY_N_SECONDS(5)
 	{
 		Serial.print("Free heap: ");
 		Serial.print(ESP.getFreeHeap());
-		Serial.println("kB");
+		Serial.println("Bytes");
 	}
 };

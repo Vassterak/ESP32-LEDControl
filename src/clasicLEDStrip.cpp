@@ -1,6 +1,6 @@
 #include "clasicLEDStrip.h"
 
-void ClassicLEDStrip::SolidColor()
+void ClassicLEDStrip::solidColor()
 {
     //runs only after the new color is received from mobile app.
     if (newColor)
@@ -11,7 +11,7 @@ void ClassicLEDStrip::SolidColor()
 };
 
 //not used
-void ClassicLEDStrip::Breathing()
+void ClassicLEDStrip::breathing()
 {
     if ((setColors[0].value + currentSpeed) < 255 && !helpBoolean)
         setColors[0].value += currentSpeed;
@@ -29,7 +29,7 @@ void ClassicLEDStrip::Breathing()
 //Effect is used for changing brightness value from 0 to 255 in linear motion.
 //Each time a value gets to the 0 the color is swapped for a new one.
 //Then it's repating to the end of the array and after that starts all over again.
-void ClassicLEDStrip::Breathing2()
+void ClassicLEDStrip::breathing2()
 {
     //same as in "void ClassicLEDStrip::SolidColor()"
     if (newColor)
@@ -67,7 +67,7 @@ void ClassicLEDStrip::Breathing2()
 };
 
 //looping through hue value forever
-void ClassicLEDStrip::Rainbow()
+void ClassicLEDStrip::rainbow()
 {
     if (newColor)
     {
@@ -83,7 +83,7 @@ void ClassicLEDStrip::Rainbow()
 //So I use integrated from FastLED library, for more info there are links:
 //https://www.alanzucconi.com/2016/01/06/colour-interpolation/
 //http://fastled.io/docs/3.1/group___colorutils.html
-void ClassicLEDStrip::Blending()
+void ClassicLEDStrip::blending()
 {
     if (newColor)
     {
@@ -126,7 +126,7 @@ void ClassicLEDStrip::Blending()
         outputColor = blend(setColors[0], setColors[1], beatsin8(currentSpeed, 0,255));
 };
 
-void ClassicLEDStrip::Pulsing()
+void ClassicLEDStrip::pulsing()
 {
     if (newColor)
     {
@@ -161,11 +161,12 @@ void ClassicLEDStrip::Pulsing()
     outputColor = setColors[helpInt2];
 };
 
-void ClassicLEDStrip::Update()
+void ClassicLEDStrip::update()
 {
     //converting HSV to RGB color scheme.
     hsv2rgb_rainbow(outputColor, rgbOutput);
 
+    //Write PWM values to Pins.
     ledcWrite(PWMChannelR, rgbOutput.red);
     ledcWrite(PWMChannelG, rgbOutput.green);
     ledcWrite(PWMChannelB, rgbOutput.blue);
