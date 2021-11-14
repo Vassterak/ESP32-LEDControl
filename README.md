@@ -13,7 +13,9 @@ Check out: [Schematic](/docs/schematics/Schematic.pdf)
 - [level shifter](/docs/media/levelshifter.png) (required only if Addressable LED stip is not getting strong enought data signal, depends on your Microcontroller)
 - LEDs strips
 ### Software for controlling:
-Mobile app yet to be released.
+- Software used for developement [MIT App Inventor](ai2.appinventor.mit.edu)
+- Mobile app yet to be released.
+
 ## Get started
 1. Install [Visual Studio Code](https://code.visualstudio.com/)
 2. Install [PlatformIO IDE](https://platformio.org/) extension (Depending on your Python version you can get error like [this](https://community.platformio.org/t/platformio-installation-failed/17419))
