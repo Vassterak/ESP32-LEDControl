@@ -130,6 +130,17 @@ class SpeedSelect : public BLECharacteristicCallbacks //BLECharacteristicCallbac
 	}
 };
 
+void functionOnCore0(void *parameter)
+{
+	while (1)
+	{
+		delay(500);
+		Serial.print("TaskRunsOnCore: ");
+		Serial.println(xPortGetCoreID());
+		Serial.println("New task on core 0");
+	}
+	
+};
 
 void setup()
 {
@@ -191,12 +202,6 @@ pinMode(BUTTON_PIN, INPUT_PULLDOWN); //input for the test button
 		0,			  /* Priority of the task */
 		&taskOnCore0, /* Task handle. */
 		0);			  /* Core where the task should run */
-};
-
-void functionOnCore0(void * parameter)
-{
-	delay(500);
-	Serial.println("RunsFromCore0");
 };
 
 void loop() //loop function works on CORE 1 (default settings)
