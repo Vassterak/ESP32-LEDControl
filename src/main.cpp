@@ -11,6 +11,7 @@
 //Variables and Classes-------------------------------------------------------------
 bool preState = 0; //for the button
 uint8_t currentMode = 0;
+TaskHandle_t taskOnCore0;
 ClassicLEDStrip _classicLEDStrip1;
 AddresableLED _addresableLED;
 
@@ -132,9 +133,9 @@ class SpeedSelect : public BLECharacteristicCallbacks //BLECharacteristicCallbac
 
 void setup()
 {
- 	pinMode(BUTTON_PIN, INPUT_PULLDOWN); //input for the test button
+pinMode(BUTTON_PIN, INPUT_PULLDOWN); //input for the test button
 
-	//SETUP for clasic led strip controlled by MOSFET, Gate is driven by PWM from defined pins
+//SETUP for clasic led strip controlled by MOSFET, Gate is driven by PWM from defined pins
 	pinMode(LED_R, OUTPUT);
 	pinMode(LED_G, OUTPUT);
 	pinMode(LED_B, OUTPUT);
@@ -181,9 +182,22 @@ void setup()
 	BLESecurity *pSecurity = new BLESecurity();
 	pSecurity->setStaticPIN(BLE_PASSCODE);
 
+	//TasksOnOtherCore setup---------------------------------------------------------------
+	xTaskCreatePinnedToCore(
+		functionOnCore0,  /* Function to implement the task */
+		"Task1",	  /* Name of the task */
+		10000,		  /* Stack size in words */
+		NULL,		  /* Task input parameter */
+		0,			  /* Priority of the task */
+		&taskOnCore0, /* Task handle. */
+		0);			  /* Core where the task should run */
 };
 
-
+void functionOnCore0(void * parameter)
+{
+	delay(500);
+	Serial.println("RunsFromCore0");
+};
 
 void loop() //loop function works on CORE 1 (default settings)
 {
@@ -234,5 +248,8 @@ void loop() //loop function works on CORE 1 (default settings)
 		Serial.print("Free heap: ");
 		Serial.print(ESP.getFreeHeap());
 		Serial.println("Bytes");
+
+		Serial.print("TaskRunsOnCore: ");
+		Serial.println(xPortGetCoreID());
 	}
 };
