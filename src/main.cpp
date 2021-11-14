@@ -53,7 +53,8 @@ class ZoneSelect : public BLECharacteristicCallbacks //BLECharacteristicCallback
 	{
 		if (currentMode == 3)
 		{
-			switch (ProccesingFunctions::inputIDProcessing(pCharacteristic->getValue()))
+			uint8_t outputValue = ProccesingFunctions::inputIDProcessing(pCharacteristic->getValue());
+			switch (outputValue)
 			{
 				//Right side of the bed
 				case 1:
@@ -78,6 +79,7 @@ class ZoneSelect : public BLECharacteristicCallbacks //BLECharacteristicCallback
 					Serial.println("None");
 					break;
 			}
+			_addresableLED.selectedZone = outputValue;
 		}
 	}
 };
@@ -86,10 +88,16 @@ class EffectSelect : public BLECharacteristicCallbacks //BLECharacteristicCallba
 {
     void onWrite(BLECharacteristic *pCharacteristic3)
 	{
-		_classicLEDStrip1.currentEffectID = ProccesingFunctions::inputIDProcessing(pCharacteristic3->getValue());
-		Serial.print("Selected Effect: ");
-		Serial.println(_classicLEDStrip1.currentEffectID);
+		uint8_t outputValue = ProccesingFunctions::inputIDProcessing(pCharacteristic3->getValue());
+		
+		if (currentMode == 1)
+			_classicLEDStrip1.currentEffectID = outputValue;
 
+		else
+			_addresableLED.currentEffectID = outputValue;
+
+		Serial.print("Selected Effect: ");
+		Serial.println(outputValue);
 	}
 };
 
@@ -97,9 +105,16 @@ class ColorSelect : public BLECharacteristicCallbacks //BLECharacteristicCallbac
 {
     void onWrite(BLECharacteristic *pCharacteristic4)
 	{
-		std::tie(_classicLEDStrip1.setColors[0], _classicLEDStrip1.setColors[1], _classicLEDStrip1.setColors[2], _classicLEDStrip1.numberOfColors) =
-			ProccesingFunctions::inputMultipleColorProcessing(pCharacteristic4->getValue());
-		_classicLEDStrip1.newColor = true;
+		if (currentMode == 1)
+		{
+			std::tie(_classicLEDStrip1.setColors[0], _classicLEDStrip1.setColors[1], _classicLEDStrip1.setColors[2], _classicLEDStrip1.numberOfColors) = ProccesingFunctions::inputMultipleColorProcessing(pCharacteristic4->getValue());
+			_classicLEDStrip1.newColor = true;
+		}
+		else if (currentMode == 2)
+		{
+			std::tie(_addresableLED.setColors[0], _addresableLED.setColors[1], _addresableLED.setColors[2], _addresableLED.numberOfColors) = ProccesingFunctions::inputMultipleColorProcessing(pCharacteristic4->getValue());
+		}
+
 
 		Serial.print("Number of colors: ");
 		Serial.println(_classicLEDStrip1.numberOfColors);
@@ -123,14 +138,20 @@ class SpeedSelect : public BLECharacteristicCallbacks //BLECharacteristicCallbac
 {
     void onWrite(BLECharacteristic *pCharacteristic5)
 	{
-		_classicLEDStrip1.currentSpeed = ProccesingFunctions::inputIDProcessing(pCharacteristic5->getValue());
-		Serial.print("Speed: ");
-		Serial.println(_classicLEDStrip1.currentSpeed);
+		uint8_t outputSpeed = ProccesingFunctions::inputIDProcessing(pCharacteristic5->getValue());
 
+		if (currentMode == 1)
+			_classicLEDStrip1.currentSpeed = outputSpeed;
+
+		else if (currentMode == 2)
+			_addresableLED.currentSpeed = outputSpeed;
+
+		Serial.print("Speed: ");
+		Serial.println(outputSpeed);
 	}
 };
 
-void functionOnCore0(void *parameter)
+void functionOnCore0(void *parameter) //Runs on core 0 in loop
 {
 	while (1)
 	{
@@ -217,33 +238,45 @@ void loop() //loop function works on CORE 1 (default settings)
 
 	EVERY_N_MILLISECONDS(20) //20ms = 50FPS
 	{
-		if (currentMode == 1 )
+
+		switch (_classicLEDStrip1.currentEffectID)
 		{
-			switch (_classicLEDStrip1.currentEffectID)
-			{
-				case 1:
-					_classicLEDStrip1.solidColor();
-					break;
+			case 1:
+				_classicLEDStrip1.solidColor();
+				break;
 
-				case 2:
-					_classicLEDStrip1.breathing2();
-					break;
+			case 2:
+				_classicLEDStrip1.breathing2();
+				break;
 
-				case 3:
-					_classicLEDStrip1.rainbow();
-					break;
-				case 4:
-					_classicLEDStrip1.blending();
-					break;
+			case 3:
+				_classicLEDStrip1.rainbow();
+				break;
+			case 4:
+				_classicLEDStrip1.blending();
+				break;
 
-				case 5:
-					_classicLEDStrip1.pulsing();
-					break;
+			case 5:
+				_classicLEDStrip1.pulsing();
+				break;
 
-				default:
-					break;
-			}
+			default:
+				break;
 		}
+
+		switch (_addresableLED.currentEffectID)
+		{
+		case 1:
+			//_addresableLED.SolidPart();
+			break;
+
+		case 2:
+			break;
+
+		default:
+			break;
+		}
+
 		_classicLEDStrip1.update();
 		//FastLED.show();
 	}

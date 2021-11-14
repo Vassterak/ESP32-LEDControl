@@ -5,8 +5,8 @@ class AddresableLED
 {
     public:
     CRGB leds[LEDS_TOTAL_NUMBER];
-    CHSV currentColors[3];
-    uint8_t currentEffectID = 0;
+    CHSV setColors[3];
+    uint8_t numberOfColors = 1, currentEffectID = 0, currentSpeed = 0, selectedZone = 0;
 
     AddresableLED()
     {
