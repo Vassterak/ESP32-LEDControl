@@ -13,8 +13,8 @@ void AddresableLED::staticRainbow()
 
 void AddresableLED::animeRainbow() 
 {
-    uint8_t hue = beat8(currentSpeed, 255);
-    fill_rainbow(leds, LEDS_TOTAL_NUMBER, hue, currentSpeed); //currentSpeed = hue incrementor
+    fill_rainbow(leds, LEDS_TOTAL_NUMBER, beat8(currentSpeed, 255), currentSpeed); //currentSpeed = hue incrementor
+    FastLED.setBrightness(setColors[0].value);
 }
 
 void AddresableLED::fallingStars() 
@@ -59,9 +59,86 @@ void AddresableLED::pulsing()
     fill_solid(leds, LEDS_TOTAL_NUMBER, setColors[helpInt2]);
 }
 
-/* void AddresableLED::fade1(uint8_t speedOfTransition, CHSV color1, CHSV color2)
+void AddresableLED::breathing()
 {
-    nblend(color1, color2, speedOfTransition);
-} */
+    if (newColor)
+    {
+        maxBrightness = setColors[0].value;
+
+        for (uint8_t i = 0; i < numberOfColors; i++)
+            setColors[i].value = 0;
+
+        helpInt = 0;
+        helpInt2 = 0;
+        newColor = false;
+        helpBoolean = false;
+    }
+
+    if ((setColors[helpInt].value + currentSpeed) < maxBrightness && !helpBoolean)
+        setColors[helpInt].value += currentSpeed;
+
+    else
+    {
+        helpBoolean = true;
+        setColors[helpInt].value -= currentSpeed;
+    }
+
+    //When value reach 0
+    if ((setColors[helpInt].value - currentSpeed) < 0)
+    {
+        helpBoolean = false;
+        helpInt++;
+
+        if (helpInt >= numberOfColors)
+            helpInt = 0;
+    }
+    fill_solid(leds, LEDS_TOTAL_NUMBER, setColors[helpInt]);
+}
+
+void AddresableLED::blending()
+{
+    if (newColor)
+    {
+        helpInt = 0;
+        helpInt2 = 0;
+        newColor = false;
+        helpBoolean = false;
+    }
+
+    if (numberOfColors > 2)
+    {
+        if ((helpInt + currentSpeed) > 255)
+        {
+            helpInt = 255;
+            helpBoolean = true;
+        }
+
+        if (helpInt2 == 2)
+            fill_solid(leds, LEDS_TOTAL_NUMBER, blend(setColors[helpInt2], setColors[0], helpInt));
+
+        else
+            fill_solid(leds, LEDS_TOTAL_NUMBER, blend(setColors[helpInt2], setColors[helpInt2 + 1], helpInt));
+
+        helpInt += currentSpeed;
+
+        if (helpBoolean)
+        {
+            helpInt2++;
+
+            if (helpInt2 == 3)
+                helpInt2 = 0;
+
+            helpBoolean = false;
+        }
+    }
+    else
+        fill_solid(leds, LEDS_TOTAL_NUMBER, blend(setColors[0], setColors[1], beatsin8(currentSpeed, 0, 255)));
+}
+
+void AddresableLED::pointTravel()
+{
+    leds[beatsin8(currentSpeed, 0, LEDS_TOTAL_NUMBER-1, 0, 0)] = CHSV(setColors[0]);
+    fadeToBlackBy(leds, LEDS_TOTAL_NUMBER, 10);
+}
 
 

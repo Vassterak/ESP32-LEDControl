@@ -109,29 +109,42 @@ class ColorSelect : public BLECharacteristicCallbacks //BLECharacteristicCallbac
 		{
 			std::tie(_classicLEDStrip1.setColors[0], _classicLEDStrip1.setColors[1], _classicLEDStrip1.setColors[2], _classicLEDStrip1.numberOfColors) = ProccesingFunctions::inputMultipleColorProcessing(pCharacteristic4->getValue());
 			_classicLEDStrip1.newColor = true;
+
+			for (uint8_t i = 0; i < 3; i++)
+			{
+				Serial.print("Hue: ");
+				Serial.println(_classicLEDStrip1.setColors[i].hue);
+
+				Serial.print("Satur: ");
+				Serial.println(_classicLEDStrip1.setColors[i].saturation);
+
+				Serial.print("Value: ");
+				Serial.println(_classicLEDStrip1.setColors[i].value);
+				Serial.println("------------------------------------------");
+			}
 		}
 		else if (currentMode == 2)
 		{
 			_addresableLED.newColor = true;
 			std::tie(_addresableLED.setColors[0], _addresableLED.setColors[1], _addresableLED.setColors[2], _addresableLED.numberOfColors) = ProccesingFunctions::inputMultipleColorProcessing(pCharacteristic4->getValue());
+
+			for (uint8_t i = 0; i < 3; i++)
+			{
+				Serial.print("Hue: ");
+				Serial.println(_addresableLED.setColors[i].hue);
+
+				Serial.print("Satur: ");
+				Serial.println(_addresableLED.setColors[i].saturation);
+
+				Serial.print("Value: ");
+				Serial.println(_addresableLED.setColors[i].value);
+				Serial.println("------------------------------------------");
+			}
 		}
 
 
 		Serial.print("Number of colors: ");
 		Serial.println(_classicLEDStrip1.numberOfColors);
-
-		for (uint8_t i = 0; i < 3; i++)
-		{
-			Serial.print("Hue: ");
-			Serial.println(_classicLEDStrip1.setColors[i].hue);
-
-			Serial.print("Satur: ");
-			Serial.println(_classicLEDStrip1.setColors[i].saturation);
-
-			Serial.print("Value: ");
-			Serial.println(_classicLEDStrip1.setColors[i].value);
-			Serial.println("------------------------------------------");
-		}
 	}
 };
 
@@ -165,15 +178,19 @@ void functionOnCore0(void *parameter) //Runs on core 0 in loop
 		else if (digitalRead(BUTTON_PIN) == LOW)
 			preState = 0;
 
-/* 		EVERY_N_SECONDS(5)
+		EVERY_N_SECONDS(2)
 		{
-			Serial.print("Free heap: ");
+/* 			Serial.print("Free heap: ");
 			Serial.print(ESP.getFreeHeap());
 			Serial.println("Bytes");
 
 			Serial.print("TaskRunsOnCore: ");
-			Serial.println(xPortGetCoreID());
-		} */
+			Serial.println(xPortGetCoreID()); */
+			Serial.println("Barva: ");
+			Serial.println(_addresableLED.setColors[0].hue);
+			Serial.println(_addresableLED.setColors[0].saturation);
+			Serial.println(_addresableLED.setColors[0].value);
+		}
 	}
 };
 
@@ -269,38 +286,41 @@ void loop() //loop function works on CORE 1 (default settings)
 				break;
 		}
 
-		switch (_addresableLED.currentEffectID) //Addresable strip (whole, NO zones)
+		if (_addresableLED.selectedZone == 0)
 		{
-		case 1:
-			_addresableLED.solidPart();
-			break;
+			switch (_addresableLED.currentEffectID) //Addresable strip (whole, NO zones)
+			{
+			case 1:
+				_addresableLED.solidPart();
+				break;
 
-		case 2:
-		_addresableLED.staticRainbow();
-			break;
+			case 2:
+				_addresableLED.staticRainbow();
+				break;
 
-		case 3:
-			_addresableLED.animeRainbow();
-			break;
+			case 3:
+				_addresableLED.animeRainbow();
+				break;
 
-		case 4:
-			_addresableLED.fallingStars();
-			break;
+			case 4:
+				_addresableLED.fallingStars();
+				break;
 
-		case 5:
+			case 5:
+				_addresableLED.breathing();
+				break;
 
-			break;
+			case 6:
+				_addresableLED.pulsing();
+				break;
 
-		case 6:
-			_addresableLED.pulsing();
-			break;
+			case 7:
+				_addresableLED.pointTravel();
+				break;
 
-		case 7:
-		
-			break;
-
-		default:
-			break;
+			default:
+				break;
+			}
 		}
 
 		_classicLEDStrip1.update();
