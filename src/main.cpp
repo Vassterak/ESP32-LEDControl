@@ -112,6 +112,7 @@ class ColorSelect : public BLECharacteristicCallbacks //BLECharacteristicCallbac
 		}
 		else if (currentMode == 2)
 		{
+			_addresableLED.newColor = true;
 			std::tie(_addresableLED.setColors[0], _addresableLED.setColors[1], _addresableLED.setColors[2], _addresableLED.numberOfColors) = ProccesingFunctions::inputMultipleColorProcessing(pCharacteristic4->getValue());
 		}
 
@@ -164,7 +165,7 @@ void functionOnCore0(void *parameter) //Runs on core 0 in loop
 		else if (digitalRead(BUTTON_PIN) == LOW)
 			preState = 0;
 
-		EVERY_N_SECONDS(5)
+/* 		EVERY_N_SECONDS(5)
 		{
 			Serial.print("Free heap: ");
 			Serial.print(ESP.getFreeHeap());
@@ -172,10 +173,8 @@ void functionOnCore0(void *parameter) //Runs on core 0 in loop
 
 			Serial.print("TaskRunsOnCore: ");
 			Serial.println(xPortGetCoreID());
-		}
-
+		} */
 	}
-	
 };
 
 void setup()
@@ -245,7 +244,7 @@ void loop() //loop function works on CORE 1 (default settings)
 	EVERY_N_MILLISECONDS(20) //20ms = 50FPS
 	{
 
-		switch (_classicLEDStrip1.currentEffectID)
+		switch (_classicLEDStrip1.currentEffectID) //Clasic LED Strip
 		{
 			case 1:
 				_classicLEDStrip1.solidColor();
@@ -270,7 +269,7 @@ void loop() //loop function works on CORE 1 (default settings)
 				break;
 		}
 
-		switch (_addresableLED.currentEffectID)
+		switch (_addresableLED.currentEffectID) //Addresable strip (whole, NO zones)
 		{
 		case 1:
 			_addresableLED.solidPart();
@@ -278,6 +277,26 @@ void loop() //loop function works on CORE 1 (default settings)
 
 		case 2:
 		_addresableLED.staticRainbow();
+			break;
+
+		case 3:
+			_addresableLED.animeRainbow();
+			break;
+
+		case 4:
+			_addresableLED.fallingStars();
+			break;
+
+		case 5:
+
+			break;
+
+		case 6:
+			_addresableLED.pulsing();
+			break;
+
+		case 7:
+		
 			break;
 
 		default:

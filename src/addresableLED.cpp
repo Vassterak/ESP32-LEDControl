@@ -8,6 +8,7 @@ void AddresableLED::solidPart()
 void AddresableLED::staticRainbow()
 {
     fill_rainbow(leds, LEDS_TOTAL_NUMBER, 0, currentSpeed); //currentSpeed = hue incrementor
+    FastLED.setBrightness(setColors[0].value);
 }
 
 void AddresableLED::animeRainbow() 
@@ -21,6 +22,41 @@ void AddresableLED::fallingStars()
     leds[random8(0, 149-1)] = CHSV(setColors[0]);
     //speedOfDisappear is how much brightness will decrese per frame 0-255
     fadeToBlackBy(leds, LEDS_TOTAL_NUMBER, currentSpeed);
+}
+
+void AddresableLED::pulsing()
+{
+    if (newColor)
+    {
+        maxBrightness = setColors[0].value; //get max brightness
+
+        for (uint8_t i = 0; i < numberOfColors; i++) //remove brightness values from all colors
+            setColors[i].value = 0;
+
+        helpInt = 0; //reset variables
+        helpInt2 = 0;
+        helpBoolean = false;
+        newColor = false;
+    }
+
+    if ((helpInt + currentSpeed) > 255) 
+    {
+        helpInt = 255;
+
+        if (!helpBoolean)
+        {
+            helpInt2++;
+            
+            if (helpInt2 >= numberOfColors)
+                helpInt2 = 0;
+        }
+        helpBoolean = !helpBoolean;
+    }
+
+    helpBoolean ? setColors[helpInt2].value = maxBrightness : setColors[helpInt2].value = 0;
+
+    helpInt += currentSpeed;
+    fill_solid(leds, LEDS_TOTAL_NUMBER, setColors[helpInt2]);
 }
 
 /* void AddresableLED::fade1(uint8_t speedOfTransition, CHSV color1, CHSV color2)

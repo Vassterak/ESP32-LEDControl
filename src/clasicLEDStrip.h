@@ -8,7 +8,7 @@ class ClassicLEDStrip
         bool newColor = false;
         CHSV setColors[3];
         CHSV outputColor;
-        uint8_t numberOfColors = 1, currentSpeed = 1, currentEffectID = 0, maxBrightness = 0;
+        uint8_t numberOfColors = 1, currentSpeed = 1, currentEffectID = 0;
         void solidColor();
         void breathing();
         void breathing2();
@@ -19,7 +19,6 @@ class ClassicLEDStrip
 
     private:
         bool helpBoolean = false;
-        uint8_t helpInt = 0;
-        uint8_t helpInt2 = 0;
+        uint8_t helpInt = 0, maxBrightness = 0, helpInt2 = 0;
         CRGB rgbOutput;
 };
