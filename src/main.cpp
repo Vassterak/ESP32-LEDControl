@@ -155,10 +155,25 @@ void functionOnCore0(void *parameter) //Runs on core 0 in loop
 {
 	while (1)
 	{
-		delay(500);
-		Serial.print("TaskRunsOnCore: ");
-		Serial.println(xPortGetCoreID());
-		Serial.println("New task on core 0");
+		//Button-------------------------------------------------------------------
+		if (digitalRead(BUTTON_PIN) == HIGH && preState == 0)
+		{
+			preState = 1;
+			ESP.restart();
+		}
+		else if (digitalRead(BUTTON_PIN) == LOW)
+			preState = 0;
+
+		EVERY_N_SECONDS(5)
+		{
+			Serial.print("Free heap: ");
+			Serial.print(ESP.getFreeHeap());
+			Serial.println("Bytes");
+
+			Serial.print("TaskRunsOnCore: ");
+			Serial.println(xPortGetCoreID());
+		}
+
 	}
 	
 };
@@ -216,26 +231,17 @@ pinMode(BUTTON_PIN, INPUT_PULLDOWN); //input for the test button
 
 	//TasksOnOtherCore setup---------------------------------------------------------------
 	xTaskCreatePinnedToCore(
-		functionOnCore0,  /* Function to implement the task */
-		"Task1",	  /* Name of the task */
-		10000,		  /* Stack size in words */
-		NULL,		  /* Task input parameter */
-		0,			  /* Priority of the task */
-		&taskOnCore0, /* Task handle. */
-		0);			  /* Core where the task should run */
+		functionOnCore0, 	/* Function to implement the task */
+		"Task1",	  		/* Name of the task */
+		10000,		  		/* Stack size in words */
+		NULL,		  		/* Task input parameter */
+		0,			  		/* Priority of the task */
+		&taskOnCore0, 		/* Task handle. */
+		0);			  		/* Core where the task should run */
 };
 
 void loop() //loop function works on CORE 1 (default settings)
 {
-  //Button-------------------------------------------------------------------
-	if (digitalRead(BUTTON_PIN) == HIGH && preState == 0)
-	{
-		preState = 1;
- 		ESP.restart();
-	}
-	else if (digitalRead(BUTTON_PIN) == LOW)
-		preState = 0;
-
 	EVERY_N_MILLISECONDS(20) //20ms = 50FPS
 	{
 
@@ -267,10 +273,11 @@ void loop() //loop function works on CORE 1 (default settings)
 		switch (_addresableLED.currentEffectID)
 		{
 		case 1:
-			//_addresableLED.SolidPart();
+			_addresableLED.solidPart();
 			break;
 
 		case 2:
+		_addresableLED.staticRainbow();
 			break;
 
 		default:
@@ -278,16 +285,6 @@ void loop() //loop function works on CORE 1 (default settings)
 		}
 
 		_classicLEDStrip1.update();
-		//FastLED.show();
-	}
-
-	EVERY_N_SECONDS(5)
-	{
-		Serial.print("Free heap: ");
-		Serial.print(ESP.getFreeHeap());
-		Serial.println("Bytes");
-
-		Serial.print("TaskRunsOnCore: ");
-		Serial.println(xPortGetCoreID());
+		FastLED.show();
 	}
 };

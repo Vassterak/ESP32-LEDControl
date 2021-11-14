@@ -1,19 +1,19 @@
 #include "addresableLED.h"
 
-void AddresableLED::SolidPart()
+void AddresableLED::solidPart()
 {
     fill_solid(leds+0, LEDS_TOTAL_NUMBER, setColors[0]);
 }
 
 void AddresableLED::staticRainbow()
 {
-    fill_rainbow(leds, LEDS_TOTAL_NUMBER, 0, currentSpeed);
+    fill_rainbow(leds, LEDS_TOTAL_NUMBER, 0, currentSpeed); //currentSpeed = hue incrementor
 }
 
 void AddresableLED::animeRainbow() 
 {
     uint8_t hue = beat8(currentSpeed, 255);
-    fill_rainbow(leds, LEDS_TOTAL_NUMBER, hue, currentSpeed);
+    fill_rainbow(leds, LEDS_TOTAL_NUMBER, hue, currentSpeed); //currentSpeed = hue incrementor
 }
 
 void AddresableLED::fallingStars() 

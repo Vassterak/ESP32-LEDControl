@@ -8,14 +8,12 @@ class AddresableLED
     CHSV setColors[3];
     uint8_t numberOfColors = 1, currentEffectID = 0, currentSpeed = 0, selectedZone = 0;
 
-    AddresableLED()
+    AddresableLED() //constructor
     {
         FastLED.addLeds<NEOPIXEL,LEDS_DATA_PIN>(leds, LEDS_TOTAL_NUMBER);
     }
 
-    void SolidPart();
-
-    // whole strip
+    void solidPart();
     void staticRainbow();
     void animeRainbow();
     void fallingStars();
