@@ -4,7 +4,7 @@
 #include <BLESecurity.h>
 
 //My files, these files also incule "definitions.h", <Arduino.h>, <FastLED.h>
-#include "addresableLED.h"
+#include "addressableLED.h"
 #include "clasicLEDStrip.h"
 #include "proccesingFunctions.h"
 
@@ -17,12 +17,12 @@ CHSV receivedColors[3];
 uint8_t receivedNumberOfColors = 0;
 TaskHandle_t taskOnCore0;
 
-CRGB AddresableLED::leds[LEDS_TOTAL_NUMBER]; //static variable initialization
+CRGB AddressableLED::leds[LEDS_TOTAL_NUMBER]; //static variable initialization
 
 ClassicLEDStrip _classicLEDStrip1;
-AddresableLED _addresableLED1;	//Instance for whole strip / first zone
-AddresableLED _addresableLED2; 	//second zone
-AddresableLED _addresableLED3;	//third zone
+AddressableLED _addresableLED1;	//Instance for whole strip / first zone
+AddressableLED _addresableLED2; 	//second zone
+AddressableLED _addresableLED3;	//third zone
 
 class ModeSelect : public BLECharacteristicCallbacks //BLECharacteristicCallbacks runs on CORE 0
 {
@@ -373,7 +373,7 @@ pinMode(BUTTON_PIN, INPUT_PULLDOWN); //input for the test button
 
 //FastLED initialization-----------------------------------------------------------
 
-	FastLED.addLeds<NEOPIXEL, LEDS_DATA_PIN>(AddresableLED::leds, LEDS_TOTAL_NUMBER);
+	FastLED.addLeds<NEOPIXEL, LEDS_DATA_PIN>(AddressableLED::leds, LEDS_TOTAL_NUMBER);
 	FastLED.clear(true);
 
 //TasksOnOtherCore setup---------------------------------------------------------------

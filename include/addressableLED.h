@@ -1,7 +1,7 @@
 #include "definitions.h"
 #include <FastLED.h>
 
-class AddresableLED
+class AddressableLED
 {
     public:
         static CRGB leds[LEDS_TOTAL_NUMBER];
