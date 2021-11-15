@@ -7,8 +7,7 @@ class AddresableLED
         static CRGB leds[LEDS_TOTAL_NUMBER];
         CHSV setColors[3];
         bool newColor = false;
-        bool zoneActive = false;
-        uint8_t numberOfColors = 1, currentEffectID = 0, currentSpeed = 0, fromLED = 0, toLED = 0;
+        uint8_t numberOfColors = 1, currentEffectID = 0, currentSpeed = 0, fromLED = 0, numberOfLEDtoFill = 0;
         
         void solidPart();
         void staticRainbow();

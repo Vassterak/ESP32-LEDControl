@@ -10,7 +10,9 @@
 
 //Variables and Classes-------------------------------------------------------------
 bool preState = 0; //for the button
+bool lastModeAddresable = false;
 uint8_t currentMode = 0;
+uint8_t currentZoneForAddresable = 0;
 CHSV receivedColors[3];
 uint8_t receivedNumberOfColors = 0;
 TaskHandle_t taskOnCore0;
@@ -18,7 +20,7 @@ TaskHandle_t taskOnCore0;
 CRGB AddresableLED::leds[LEDS_TOTAL_NUMBER]; //static variable initialization
 
 ClassicLEDStrip _classicLEDStrip1;
-AddresableLED _addresableLED;	//Instance for whole strip / first zone
+AddresableLED _addresableLED1;	//Instance for whole strip / first zone
 AddresableLED _addresableLED2; 	//second zone
 AddresableLED _addresableLED3;	//third zone
 
@@ -40,39 +42,9 @@ class ZoneSelect : public BLECharacteristicCallbacks //BLECharacteristicCallback
 	{
 		if (currentMode == 3)
 		{
-			uint8_t outputValue = ProccesingFunctions::inputIDProcessing(pCharacteristic->getValue());
-			switch (outputValue)
-			{
-				//Right side of the bed
-				case 1:
-					_addresableLED.zoneActive = true;
-					Serial.print("Selected Zone: ");
-					Serial.println("1");
-					break;
-
-				//Center side of the bed
-				case 2:
-					_addresableLED2.zoneActive = true;
-					Serial.print("Selected Zone: ");
-					Serial.println("2");
-					break;
-
-				//Left side
-				case 3:
-					_addresableLED3.zoneActive = true;
-					Serial.print("Selected Zone: ");
-					Serial.println("3");
-					break;
-
-				//when zero is received
-				default:
-					_addresableLED3.zoneActive = false;
-					_addresableLED2.zoneActive = false;
-					_addresableLED.zoneActive = false;
-					Serial.print("Selected Zone: ");
-					Serial.println("None");
-					break;
-			}
+			currentZoneForAddresable = ProccesingFunctions::inputIDProcessing(pCharacteristic->getValue());
+			Serial.print("Current Zone: ");
+			Serial.println(currentZoneForAddresable);
 		}
 	}
 };
@@ -90,28 +62,43 @@ class EffectSelect : public BLECharacteristicCallbacks //BLECharacteristicCallba
 			break;
 
 		case 2:
-			_addresableLED.currentEffectID = outputValue;
-			_addresableLED.fromLED = 0;
-			_addresableLED.toLED = LEDS_TOTAL_NUMBER;
+			lastModeAddresable = true;
+			FastLED.clear(true);
+			_addresableLED1.currentEffectID = outputValue;
+			_addresableLED2.currentEffectID = 0;
+			_addresableLED3.currentEffectID = 0;
+
+			_addresableLED1.fromLED = 0;
+			_addresableLED1.numberOfLEDtoFill = LEDS_TOTAL_NUMBER;
 			break;
 
 		case 3:
-			if (_addresableLED.zoneActive)
+
+			if (lastModeAddresable)
 			{
-				_addresableLED.fromLED = 0;
-				_addresableLED.toLED = LEDS_ZONE_PART1;
-				_addresableLED.currentEffectID = outputValue;
+				_addresableLED1.currentEffectID = 0;
+				_addresableLED2.currentEffectID = 0;
+				_addresableLED3.currentEffectID = 0;
+				FastLED.clear();
+				lastModeAddresable = false;
 			}
-			else if (_addresableLED2.zoneActive)
+
+			if (currentZoneForAddresable == 1)
 			{
-				_addresableLED2.fromLED = LEDS_ZONE_PART1+1;
-				_addresableLED2.toLED = LEDS_ZONE_PART2;
+				_addresableLED1.fromLED = 0;
+				_addresableLED1.numberOfLEDtoFill = LEDS_ZONE_PART1;
+				_addresableLED1.currentEffectID = outputValue;
+			}
+			else if (currentZoneForAddresable == 2)
+			{
+				_addresableLED2.fromLED = LEDS_ZONE_PART1;
+				_addresableLED2.numberOfLEDtoFill = LEDS_ZONE_PART2-LEDS_ZONE_PART1;
 				_addresableLED2.currentEffectID = outputValue;
 			}
-			else if (_addresableLED3.zoneActive)
+			else if (currentZoneForAddresable == 3)
 			{
-				_addresableLED3.fromLED = LEDS_ZONE_PART2+1;
-				_addresableLED3.toLED = LEDS_TOTAL_NUMBER; //-1 is removed in functions inside class
+				_addresableLED3.fromLED = LEDS_ZONE_PART2;
+				_addresableLED3.numberOfLEDtoFill = LEDS_TOTAL_NUMBER-LEDS_ZONE_PART2; //-1 is removed in functions inside class
 				_addresableLED3.currentEffectID = outputValue;
 			}
 			break;
@@ -142,24 +129,24 @@ class ColorSelect : public BLECharacteristicCallbacks //BLECharacteristicCallbac
 			break;
 
 			case 2:
-				_addresableLED.setColors[0] = receivedColors[0];
-				_addresableLED.setColors[1] = receivedColors[1];
-				_addresableLED.setColors[2] = receivedColors[2];
-				_addresableLED.numberOfColors = receivedNumberOfColors;
-				_addresableLED.newColor = true;
+				_addresableLED1.setColors[0] = receivedColors[0];
+				_addresableLED1.setColors[1] = receivedColors[1];
+				_addresableLED1.setColors[2] = receivedColors[2];
+				_addresableLED1.numberOfColors = receivedNumberOfColors;
+				_addresableLED1.newColor = true;
 				break;
 
 			case 3:
-				if (_addresableLED.zoneActive)
+				if (currentZoneForAddresable == 1)
 				{
-					_addresableLED.setColors[0] = receivedColors[0];
-					_addresableLED.setColors[1] = receivedColors[1];
-					_addresableLED.setColors[2] = receivedColors[2];
-					_addresableLED.numberOfColors = receivedNumberOfColors;
-					_addresableLED.newColor = true;
+					_addresableLED1.setColors[0] = receivedColors[0];
+					_addresableLED1.setColors[1] = receivedColors[1];
+					_addresableLED1.setColors[2] = receivedColors[2];
+					_addresableLED1.numberOfColors = receivedNumberOfColors;
+					_addresableLED1.newColor = true;
 				}
 
-				else if (_addresableLED2.zoneActive)
+				else if (currentZoneForAddresable == 2)
 				{
 					_addresableLED2.setColors[0] = receivedColors[0];
 					_addresableLED2.setColors[1] = receivedColors[1];
@@ -168,7 +155,7 @@ class ColorSelect : public BLECharacteristicCallbacks //BLECharacteristicCallbac
 					_addresableLED2.newColor = true;
 				}
 
-				else if (_addresableLED3.zoneActive)
+				else if (currentZoneForAddresable == 3)
 				{
 					_addresableLED3.setColors[0] = receivedColors[0];
 					_addresableLED3.setColors[1] = receivedColors[1];
@@ -213,17 +200,17 @@ class SpeedSelect : public BLECharacteristicCallbacks //BLECharacteristicCallbac
 			break;
 
 		case 2:
-			_addresableLED.currentSpeed = outputSpeed;
+			_addresableLED1.currentSpeed = outputSpeed;
 			break;
 
 		case 3:
-			if (_addresableLED.zoneActive)
-				_addresableLED.currentSpeed = outputSpeed;
+			if (currentZoneForAddresable == 1)
+				_addresableLED1.currentSpeed = outputSpeed;
 
-			else if (_addresableLED2.zoneActive)
+			else if (currentZoneForAddresable == 2)
 				_addresableLED2.currentSpeed = outputSpeed;
 
-			else if (_addresableLED3.zoneActive)
+			else if (currentZoneForAddresable == 3)
 				_addresableLED3.currentSpeed = outputSpeed;
 
 			break;
@@ -250,11 +237,86 @@ void functionOnCore0(void *parameter) //Runs on core 0 in loop
 		else if (digitalRead(BUTTON_PIN) == LOW)
 			preState = 0;
 
-/* 		EVERY_N_SECONDS(2)
+		EVERY_N_MILLISECONDS(20)
 		{
-			Serial.print("Free heap: ");
-			Serial.print(ESP.getFreeHeap());
-		} */
+			switch (_addresableLED2.currentEffectID)
+			{
+			case 1:
+				_addresableLED2.solidPart();
+				break;
+
+			case 2:
+				_addresableLED2.staticRainbow();
+				break;
+
+			case 3:
+				_addresableLED2.animeRainbow();
+				break;
+
+			case 4:
+				_addresableLED2.fallingStars();
+				break;
+
+			case 5:
+				_addresableLED2.breathing();
+				break;
+
+			case 6:
+				_addresableLED2.pulsing();
+				break;
+
+			case 7:
+				_addresableLED2.pointTravel();
+				break;
+
+			case 8:
+				_addresableLED2.blending();
+				break;
+
+			default:
+				//FastLED.clear(true);
+				break;
+			}
+
+			switch (_addresableLED3.currentEffectID)
+			{
+			case 1:
+				_addresableLED3.solidPart();
+				break;
+
+			case 2:
+				_addresableLED3.staticRainbow();
+				break;
+
+			case 3:
+				_addresableLED3.animeRainbow();
+				break;
+
+			case 4:
+				_addresableLED3.fallingStars();
+				break;
+
+			case 5:
+				_addresableLED3.breathing();
+				break;
+
+			case 6:
+				_addresableLED3.pulsing();
+				break;
+
+			case 7:
+				_addresableLED3.pointTravel();
+				break;
+
+			case 8:
+				_addresableLED3.blending();
+				break;
+
+			default:
+				//FastLED.clear(true);
+				break;
+			}
+		}
 	}
 };
 
@@ -351,49 +413,51 @@ void loop() //loop function works on CORE 1 (default settings)
 				_classicLEDStrip1.pulsing();
 				break;
 
-			default:
-				break;
+			default: //Turn of PWM output
+				ledcWrite(PWMChannelR, 0);
+				ledcWrite(PWMChannelG, 0);
+				ledcWrite(PWMChannelB, 0);
+			break;
 		}
 
-		switch (_addresableLED.currentEffectID) //Addresable strip whole/zone1
+		switch (_addresableLED1.currentEffectID) //Addresable strip whole/zone1
 		{
 			case 1:
-				_addresableLED.solidPart();
+				_addresableLED1.solidPart();
 				break;
 
 			case 2:
-				_addresableLED.staticRainbow();
+				_addresableLED1.staticRainbow();
 				break;
 
 			case 3:
-				_addresableLED.animeRainbow();
+				_addresableLED1.animeRainbow();
 				break;
 
 			case 4:
-				_addresableLED.fallingStars();
+				_addresableLED1.fallingStars();
 				break;
 
 			case 5:
-				_addresableLED.breathing();
+				_addresableLED1.breathing();
 				break;
 
 			case 6:
-				_addresableLED.pulsing();
+				_addresableLED1.pulsing();
 				break;
 
 			case 7:
-				_addresableLED.pointTravel();
+				_addresableLED1.pointTravel();
 				break;
 
 			case 8:
-				_addresableLED.blending();
+				_addresableLED1.blending();
 				break;
 
 			default:
 				FastLED.clear(true);
 				break;
 		}
-
 		_classicLEDStrip1.update();
 		FastLED.show();
 	}
