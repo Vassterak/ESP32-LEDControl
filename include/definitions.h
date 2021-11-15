@@ -32,14 +32,14 @@ const int MAX_DUTY_CYCLE = (int)((PWMResolution * PWMResolution) - 1); //calcula
 //Bluetooth----------------------------------------------------------
 #define BUTTON_PIN 32                 //IO14 Pin nuber 13
 #define BLE_DEV_NAME "LED Controller" //Visible bluetooth name of the ESP32
-#define BLE_PASSCODE 123456           //Set your own passcode for pairing!
-#define SERVICE_UUID "Your custom UUID! replace this string!"
+#define BLE_PASSCODE 123456           //Set your own passcode for pairing
+#define SERVICE_UUID "265c24be-020f-11ec-9a03-0242ac130003"
 
-//CHARACTERISTIC_UUIDs each one has to be unique!
-#define LED_ZONE_SELECT "Your custom UUID! replace this string!"   //zones for addresable led strip
-#define LED_MODE_SELECT "Your custom UUID! replace this string!"   //modes to switch (addreable/classic strip/zone mode/whole strip)
-#define LED_EFFECT_SELECT "Your custom UUID! replace this string!" //effect code to apply
-#define LED_COLOR "Your custom UUID! replace this string!"         //color for effect, including brightness
-#define LED_SPEED "Your custom UUID! replace this string!"         //speed of the effect/additional variable for usage of complex effects
+//CHARACTERISTIC_UUIDs
+#define LED_ZONE_SELECT "265c2752-020f-11ec-9a03-0242ac130003"   //zones for addresable led strip
+#define LED_MODE_SELECT "265c2860-020f-11ec-9a03-0242ac130003"   //modes to switch (addreable/classic strip/zone mode/whole strip)
+#define LED_EFFECT_SELECT "265c293c-020f-11ec-9a03-0242ac130003" //effect code to apply
+#define LED_COLOR "265c2a9a-020f-11ec-9a03-0242ac130003"         //color for effect, including brightness
+#define LED_SPEED "265c30bc-020f-11ec-9a03-0242ac130003"         //speed of the effect/additional variable for usage of complex effects
 
 #endif
