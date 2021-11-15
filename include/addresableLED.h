@@ -12,7 +12,7 @@ class AddresableLED
         AddresableLED() //constructor
         {
             FastLED.addLeds<NEOPIXEL,LEDS_DATA_PIN>(leds, LEDS_TOTAL_NUMBER);
-            FastLED.clear();
+            FastLED.clear(true);
         }
 
         void solidPart();

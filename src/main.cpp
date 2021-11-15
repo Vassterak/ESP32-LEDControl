@@ -186,10 +186,6 @@ void functionOnCore0(void *parameter) //Runs on core 0 in loop
 
 			Serial.print("TaskRunsOnCore: ");
 			Serial.println(xPortGetCoreID()); */
-			Serial.println("Barva: ");
-			Serial.println(_addresableLED.setColors[0].hue);
-			Serial.println(_addresableLED.setColors[0].saturation);
-			Serial.println(_addresableLED.setColors[0].value);
 		}
 	}
 };
@@ -318,7 +314,12 @@ void loop() //loop function works on CORE 1 (default settings)
 				_addresableLED.pointTravel();
 				break;
 
+			case 8:
+				_addresableLED.blending();
+				break;
+
 			default:
+				FastLED.clear(true);
 				break;
 			}
 		}
