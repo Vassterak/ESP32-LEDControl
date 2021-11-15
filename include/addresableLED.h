@@ -4,17 +4,11 @@
 class AddresableLED
 {
     public:
-        CRGB leds[LEDS_TOTAL_NUMBER];
+        static CRGB leds[LEDS_TOTAL_NUMBER];
         CHSV setColors[3];
         bool newColor = false;
         uint8_t numberOfColors = 1, currentEffectID = 0, currentSpeed = 0, selectedZone = 0;
-
-        AddresableLED() //constructor
-        {
-            FastLED.addLeds<NEOPIXEL,LEDS_DATA_PIN>(leds, LEDS_TOTAL_NUMBER);
-            FastLED.clear(true);
-        }
-
+        
         void solidPart();
         void staticRainbow();
         void animeRainbow();

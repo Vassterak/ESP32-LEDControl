@@ -2,7 +2,7 @@
 
 void AddresableLED::solidPart()
 {
-    fill_solid(leds+0, LEDS_TOTAL_NUMBER-1, setColors[0]);
+    fill_solid(leds, LEDS_TOTAL_NUMBER-1, setColors[0]);
 }
 
 void AddresableLED::staticRainbow()

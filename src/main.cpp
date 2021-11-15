@@ -12,6 +12,7 @@
 bool preState = 0; //for the button
 uint8_t currentMode = 0;
 TaskHandle_t taskOnCore0;
+CRGB AddresableLED::leds[LEDS_TOTAL_NUMBER];
 ClassicLEDStrip _classicLEDStrip1;
 AddresableLED _addresableLED;
 
@@ -178,15 +179,11 @@ void functionOnCore0(void *parameter) //Runs on core 0 in loop
 		else if (digitalRead(BUTTON_PIN) == LOW)
 			preState = 0;
 
-		EVERY_N_SECONDS(2)
+/* 		EVERY_N_SECONDS(2)
 		{
-/* 			Serial.print("Free heap: ");
+			Serial.print("Free heap: ");
 			Serial.print(ESP.getFreeHeap());
-			Serial.println("Bytes");
-
-			Serial.print("TaskRunsOnCore: ");
-			Serial.println(xPortGetCoreID()); */
-		}
+		} */
 	}
 };
 
@@ -241,7 +238,12 @@ pinMode(BUTTON_PIN, INPUT_PULLDOWN); //input for the test button
 	BLESecurity *pSecurity = new BLESecurity();
 	pSecurity->setStaticPIN(BLE_PASSCODE);
 
-	//TasksOnOtherCore setup---------------------------------------------------------------
+//FastLED initialization-----------------------------------------------------------
+
+	FastLED.addLeds<NEOPIXEL, LEDS_DATA_PIN>(AddresableLED::leds, LEDS_TOTAL_NUMBER);
+	FastLED.clear(true);
+
+//TasksOnOtherCore setup---------------------------------------------------------------
 	xTaskCreatePinnedToCore(
 		functionOnCore0, 	/* Function to implement the task */
 		"Task1",	  		/* Name of the task */
