@@ -11,40 +11,26 @@
 //Variables and Classes-------------------------------------------------------------
 bool preState = 0; //for the button
 uint8_t currentMode = 0;
+CHSV receivedColors[3];
+uint8_t receivedNumberOfColors = 0;
 TaskHandle_t taskOnCore0;
-CRGB AddresableLED::leds[LEDS_TOTAL_NUMBER];
-ClassicLEDStrip _classicLEDStrip1;
-AddresableLED _addresableLED;
 
+CRGB AddresableLED::leds[LEDS_TOTAL_NUMBER]; //static variable initialization
+
+ClassicLEDStrip _classicLEDStrip1;
+AddresableLED _addresableLED;	//Instance for whole strip / first zone
+AddresableLED _addresableLED2; 	//second zone
+AddresableLED _addresableLED3;	//third zone
 
 class ModeSelect : public BLECharacteristicCallbacks //BLECharacteristicCallbacks runs on CORE 0
 {
 	//Called when data is sent to ESP32 for process
     void onWrite(BLECharacteristic *pCharacteristic2)
 	{
-		switch (ProccesingFunctions::inputIDProcessing(pCharacteristic2->getValue()))
-		{
-		case 1: //Classic strip
-			Serial.print("Selected Mode: ");
-			Serial.println("1");
-			currentMode = 1;
-			break;
+		currentMode = ProccesingFunctions::inputIDProcessing(pCharacteristic2->getValue());
 
-		case 2: //Addressable strip whole
-			currentMode = 2;
-			Serial.print("Selected Mode: ");
-			Serial.println("2");
-			break;
-
-		case 3: //Addressable strip zones
-			currentMode = 3;
-			Serial.print("Selected Mode: ");
-			Serial.println("3");
-			break;
-
-		default:
-			break;
-		}
+		Serial.print("Current Mode: ");
+		Serial.println(currentMode);
 	}
 };
 
@@ -59,28 +45,34 @@ class ZoneSelect : public BLECharacteristicCallbacks //BLECharacteristicCallback
 			{
 				//Right side of the bed
 				case 1:
+					_addresableLED.zoneActive = true;
 					Serial.print("Selected Zone: ");
 					Serial.println("1");
 					break;
 
 				//Center side of the bed
 				case 2:
+					_addresableLED2.zoneActive = true;
 					Serial.print("Selected Zone: ");
 					Serial.println("2");
 					break;
 
 				//Left side
 				case 3:
+					_addresableLED3.zoneActive = true;
 					Serial.print("Selected Zone: ");
 					Serial.println("3");
 					break;
 
+				//when zero is received
 				default:
+					_addresableLED3.zoneActive = false;
+					_addresableLED2.zoneActive = false;
+					_addresableLED.zoneActive = false;
 					Serial.print("Selected Zone: ");
 					Serial.println("None");
 					break;
 			}
-			_addresableLED.selectedZone = outputValue;
 		}
 	}
 };
@@ -90,12 +82,43 @@ class EffectSelect : public BLECharacteristicCallbacks //BLECharacteristicCallba
     void onWrite(BLECharacteristic *pCharacteristic3)
 	{
 		uint8_t outputValue = ProccesingFunctions::inputIDProcessing(pCharacteristic3->getValue());
-		
-		if (currentMode == 1)
-			_classicLEDStrip1.currentEffectID = outputValue;
 
-		else
+		switch (currentMode)
+		{
+		case 1:
+			_classicLEDStrip1.currentEffectID = outputValue;
+			break;
+
+		case 2:
 			_addresableLED.currentEffectID = outputValue;
+			_addresableLED.fromLED = 0;
+			_addresableLED.toLED = LEDS_TOTAL_NUMBER;
+			break;
+
+		case 3:
+			if (_addresableLED.zoneActive)
+			{
+				_addresableLED.fromLED = 0;
+				_addresableLED.toLED = LEDS_ZONE_PART1;
+				_addresableLED.currentEffectID = outputValue;
+			}
+			else if (_addresableLED2.zoneActive)
+			{
+				_addresableLED2.fromLED = LEDS_ZONE_PART1+1;
+				_addresableLED2.toLED = LEDS_ZONE_PART2;
+				_addresableLED2.currentEffectID = outputValue;
+			}
+			else if (_addresableLED3.zoneActive)
+			{
+				_addresableLED3.fromLED = LEDS_ZONE_PART2+1;
+				_addresableLED3.toLED = LEDS_TOTAL_NUMBER; //-1 is removed in functions inside class
+				_addresableLED3.currentEffectID = outputValue;
+			}
+			break;
+
+		default:
+			break;
+		}
 
 		Serial.print("Selected Effect: ");
 		Serial.println(outputValue);
@@ -106,46 +129,74 @@ class ColorSelect : public BLECharacteristicCallbacks //BLECharacteristicCallbac
 {
     void onWrite(BLECharacteristic *pCharacteristic4)
 	{
-		if (currentMode == 1)
+		std::tie(receivedColors[0], receivedColors[1], receivedColors[2], receivedNumberOfColors) = ProccesingFunctions::inputMultipleColorProcessing(pCharacteristic4->getValue());
+		
+		switch (currentMode)
 		{
-			std::tie(_classicLEDStrip1.setColors[0], _classicLEDStrip1.setColors[1], _classicLEDStrip1.setColors[2], _classicLEDStrip1.numberOfColors) = ProccesingFunctions::inputMultipleColorProcessing(pCharacteristic4->getValue());
+			case 1:
+			_classicLEDStrip1.setColors[0] = receivedColors[0];
+			_classicLEDStrip1.setColors[1] = receivedColors[1];
+			_classicLEDStrip1.setColors[2] = receivedColors[2];
+			_classicLEDStrip1.numberOfColors = receivedNumberOfColors;
 			_classicLEDStrip1.newColor = true;
+			break;
 
-			for (uint8_t i = 0; i < 3; i++)
-			{
-				Serial.print("Hue: ");
-				Serial.println(_classicLEDStrip1.setColors[i].hue);
+			case 2:
+				_addresableLED.setColors[0] = receivedColors[0];
+				_addresableLED.setColors[1] = receivedColors[1];
+				_addresableLED.setColors[2] = receivedColors[2];
+				_addresableLED.numberOfColors = receivedNumberOfColors;
+				_addresableLED.newColor = true;
+				break;
 
-				Serial.print("Satur: ");
-				Serial.println(_classicLEDStrip1.setColors[i].saturation);
+			case 3:
+				if (_addresableLED.zoneActive)
+				{
+					_addresableLED.setColors[0] = receivedColors[0];
+					_addresableLED.setColors[1] = receivedColors[1];
+					_addresableLED.setColors[2] = receivedColors[2];
+					_addresableLED.numberOfColors = receivedNumberOfColors;
+					_addresableLED.newColor = true;
+				}
 
-				Serial.print("Value: ");
-				Serial.println(_classicLEDStrip1.setColors[i].value);
-				Serial.println("------------------------------------------");
-			}
+				else if (_addresableLED2.zoneActive)
+				{
+					_addresableLED2.setColors[0] = receivedColors[0];
+					_addresableLED2.setColors[1] = receivedColors[1];
+					_addresableLED2.setColors[2] = receivedColors[2];
+					_addresableLED2.numberOfColors = receivedNumberOfColors;
+					_addresableLED2.newColor = true;
+				}
+
+				else if (_addresableLED3.zoneActive)
+				{
+					_addresableLED3.setColors[0] = receivedColors[0];
+					_addresableLED3.setColors[1] = receivedColors[1];
+					_addresableLED3.setColors[2] = receivedColors[2];
+					_addresableLED3.numberOfColors = receivedNumberOfColors;
+					_addresableLED3.newColor = true;
+				}
+				break;
+
+			default:
+				break;
 		}
-		else if (currentMode == 2)
+
+		for (uint8_t i = 0; i < 3; i++)
 		{
-			_addresableLED.newColor = true;
-			std::tie(_addresableLED.setColors[0], _addresableLED.setColors[1], _addresableLED.setColors[2], _addresableLED.numberOfColors) = ProccesingFunctions::inputMultipleColorProcessing(pCharacteristic4->getValue());
+			Serial.print("Hue: ");
+			Serial.println(receivedColors[i].hue);
 
-			for (uint8_t i = 0; i < 3; i++)
-			{
-				Serial.print("Hue: ");
-				Serial.println(_addresableLED.setColors[i].hue);
+			Serial.print("Satur: ");
+			Serial.println(receivedColors[i].saturation);
 
-				Serial.print("Satur: ");
-				Serial.println(_addresableLED.setColors[i].saturation);
-
-				Serial.print("Value: ");
-				Serial.println(_addresableLED.setColors[i].value);
-				Serial.println("------------------------------------------");
-			}
+			Serial.print("Value: ");
+			Serial.println(receivedColors[i].value);
+			Serial.println("------------------------------------------");
 		}
-
 
 		Serial.print("Number of colors: ");
-		Serial.println(_classicLEDStrip1.numberOfColors);
+		Serial.println(receivedNumberOfColors);
 	}
 };
 
@@ -155,11 +206,31 @@ class SpeedSelect : public BLECharacteristicCallbacks //BLECharacteristicCallbac
 	{
 		uint8_t outputSpeed = ProccesingFunctions::inputIDProcessing(pCharacteristic5->getValue());
 
-		if (currentMode == 1)
+		switch (currentMode)
+		{
+		case 1:
 			_classicLEDStrip1.currentSpeed = outputSpeed;
+			break;
 
-		else if (currentMode == 2)
+		case 2:
 			_addresableLED.currentSpeed = outputSpeed;
+			break;
+
+		case 3:
+			if (_addresableLED.zoneActive)
+				_addresableLED.currentSpeed = outputSpeed;
+
+			else if (_addresableLED2.zoneActive)
+				_addresableLED2.currentSpeed = outputSpeed;
+
+			else if (_addresableLED3.zoneActive)
+				_addresableLED3.currentSpeed = outputSpeed;
+
+			break;
+
+		default:
+			break;
+		}
 
 		Serial.print("Speed: ");
 		Serial.println(outputSpeed);
@@ -284,10 +355,8 @@ void loop() //loop function works on CORE 1 (default settings)
 				break;
 		}
 
-		if (_addresableLED.selectedZone == 0)
+		switch (_addresableLED.currentEffectID) //Addresable strip whole/zone1
 		{
-			switch (_addresableLED.currentEffectID) //Addresable strip (whole, NO zones)
-			{
 			case 1:
 				_addresableLED.solidPart();
 				break;
@@ -323,7 +392,6 @@ void loop() //loop function works on CORE 1 (default settings)
 			default:
 				FastLED.clear(true);
 				break;
-			}
 		}
 
 		_classicLEDStrip1.update();
