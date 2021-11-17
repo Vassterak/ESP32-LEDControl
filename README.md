@@ -13,8 +13,8 @@ Check out: [Schematic](/docs/schematics/Schematic.pdf)
 - [level shifter](/docs/media/levelshifter.png) (required only if Addressable LED stip is not getting strong enought data signal, depends on your Microcontroller)
 - LEDs strips
 ### Software for controlling:
-- Software used for developement [MIT App Inventor](ai2.appinventor.mit.edu)
-- Mobile app yet to be released.
+- Software used for developement [MIT App Inventor](http://ai2.appinventor.mit.edu)
+- Mobile app released + [Source](/mobile_app/LED_Controller_AndroidApplication.aia).
 
 ## Get started
 1. Install [Visual Studio Code](https://code.visualstudio.com/)
