@@ -32,4 +32,4 @@ Check out: [Schematic](/docs/schematics/Schematic.pdf)
 no_ota.csv => file that sets correct partition sizes, needed because BLE library is quite huge. [More info](https://iotespresso.com/how-to-set-partitions-in-esp32/).  
 platformio.ini => file that applies **partition config** and sets correct **dev. board**, **lib dependencies** and other settings. (It's something like simple MAKEFILE)
 ## License
-Not yet...
+[License](/LICENSE)
