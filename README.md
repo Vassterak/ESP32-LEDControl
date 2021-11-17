@@ -16,6 +16,14 @@ Check out: [Schematic](/docs/schematics/Schematic.pdf)
 - Software used for developement [MIT App Inventor](http://ai2.appinventor.mit.edu)
 - Mobile app released + [Source](/mobile_app/LED_Controller_AndroidApplication.aia).
 
+## Outcome
+<p align="center">
+  <img src="/docs/media/outcome1.gif" alt="video of active leds">
+</p>
+<p align="center">
+  <img width="600" src="/docs/media/outcome2.png" alt="image of controller">
+</p>
+
 ## Get started
 1. Install [Visual Studio Code](https://code.visualstudio.com/)
 2. Install [PlatformIO IDE](https://platformio.org/) extension (Depending on your Python version you can get error like [this](https://community.platformio.org/t/platformio-installation-failed/17419))
