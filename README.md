@@ -1,16 +1,16 @@
 # Overview
 My code for ESP32 (espressif32) board. Which is used for controlling Classic LED strip and Addressable LED strip via mobile app over low energy bluetooth protocol (BLE).
 
-## What does projects contains?
+## What does project contains?
 ### Libraries for microcontroller code:
 For addressable LED strip and multiple color effects: [FastLED](https://github.com/FastLED/FastLED), [Documentation 1](http://fastled.io/docs/3.1/index.html), [Documentation 2](https://github.com/FastLED/FastLED/wiki/Overview)  
 For Bluetooth communication: [BLE](https://www.arduino.cc/reference/en/libraries/esp32-ble-arduino/), [Documentation](https://github.com/nkolban/ESP32_BLE_Arduino)  
 ### Hardware for circuit build:
 Check out: [Schematic](/docs/schematics/Schematic.pdf)
-- 12V power supply (max power depands how many LEDs strips you would like to drive. For me 50W (4A)).
+- 12V power supply (max power depends how many LEDs strips you would like to drive. For me 50W (4A)).
 - [Mini SMD step-down 12V](/docs/media/stepdown.png) => 5V for microcontroller.
 - IoT ESP-WROOM-32 2.4GHz Dual-Mode CP2102 with 4MB Flash.
-- [level shifter](/docs/media/levelshifter.png) (required only if Addressable LED stip is not getting strong enought data signal, depends on your Microcontroller)
+- [level shifter](/docs/media/levelshifter.png) (required only if Addressable LED strip is not getting strong enough data signal, depends on your Microcontroller)
 - LEDs strips
 ### Software for controlling:
 - Software used for developement [MIT App Inventor](http://ai2.appinventor.mit.edu)
