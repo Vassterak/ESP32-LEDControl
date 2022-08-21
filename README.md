@@ -13,7 +13,7 @@ Check out: [Schematic](/docs/schematics/Schematic.pdf)
 - [level shifter](/docs/media/levelshifter.png) (required only if Addressable LED strip is not getting strong enough data signal, depends on your Microcontroller)
 - LEDs strips
 ### Software for controlling:
-- Software used for developement [MIT App Inventor](http://ai2.appinventor.mit.edu)
+- Software used for mobile app developement [MIT App Inventor](http://ai2.appinventor.mit.edu)
 - Mobile app released + [Source](/mobile_app/LED_Controller_AndroidApplication.aia).
 
 ## Outcome
